@@ -1,7 +1,7 @@
 
 
-all: main.c scanner.yy.c parser.tab.c
-	gcc -gdwarf-2 -obasic-s *.c
+all: main.c scanner.yy.c parser.tab.c slist.c
+	gcc -gdwarf-2 -obasic-s main.c scanner.yy.c parser.tab.c slist.c
 
 
 scanner.yy.c: scanner.l
