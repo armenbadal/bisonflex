@@ -1,12 +1,13 @@
 
 #include <stdlib.h>
+#include <gc.h>
 
 #include "slist.h"
 
 /**/
 struct node* create_node( void* vl )
 {
-  struct node* res = malloc(sizeof(struct node));
+  struct node* res = GC_MALLOC(sizeof(struct node));
   res->data = vl; res->next = NULL;
   return res;
 }
