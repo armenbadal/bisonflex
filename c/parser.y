@@ -4,7 +4,11 @@
 
 extern int yyerror( const char* );
 extern int yylex();
+
+extern int yylineno;
 %}
+
+%error-verbose
 
 %token xIdent
 %token xNumber
@@ -34,14 +38,20 @@ extern int yylex();
 %right xPow
 %right xNot
 
+%token xEol
 %token xEof
 
 %start Program
 %%
 Program
-    : FunctionList xEof
-	{}
+    : OptionalNewLines FunctionList xEof
+	{
+	  puts("PARSED");
+	  return 0;
+	}
 	;
+
+OptionalNewLines : NewLines | /* empty */ ;
 
 FunctionList
     : FunctionList Function
@@ -50,7 +60,7 @@ FunctionList
 
 Function
     : xDeclare FunctionHeader
-    | FunctionHeader StatementList xEnd xFunction
+    | FunctionHeader StatementList xEnd xFunction NewLines
 	;
 
 FunctionHeader
@@ -63,8 +73,8 @@ ParameterList
 	;
 
 NewLines
-    : NewLines '\n'
-	| '\n'
+    : NewLines xEol
+	| xEol
 	;
 
 IdentifierList
@@ -80,9 +90,9 @@ StatementList
 Statement
     : xInput xIdent
 	| xPrint Expression
-	| OptionalLet xIdent '=' Expression
+	| OptionalLet xIdent xEq Expression
 	| xIf Expression xThen NewLines StatementList ElseIfPartList ElsePart xEnd xIf
-	| xFor xIdent '=' Expression xTo Expression OptionalStep NewLines StatementList xEnd xFor
+	| xFor xIdent xEq Expression xTo Expression OptionalStep NewLines StatementList xEnd xFor
 	| xWhile Expression NewLines StatementList xEnd xWhile
 	| xCall xIdent ArgumentList
 	;
@@ -143,7 +153,7 @@ Expression
 
 int yyerror( const char* message )
 {
-  fprintf(stderr, "ERROR: %s\n", message);
+  fprintf(stderr, "ERROR: (%d) %s\n", yylineno, message);
   return 1;
 }
 

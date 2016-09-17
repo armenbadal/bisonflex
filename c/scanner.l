@@ -44,6 +44,7 @@ comment     \'.*$
 "*"         { return xMul; }
 "/"         { return xDiv; }
 "^"         { return xPow; }
+\n          { return xEol; }
 .           { return (int)yytext[0]; }
 <<EOF>>      { return xEof; }
 
