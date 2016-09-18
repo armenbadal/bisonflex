@@ -1,7 +1,8 @@
 
+SOURCES=main.c scanner.yy.c parser.tab.c slist.c
 
-all: main.c scanner.yy.c parser.tab.c slist.c
-	gcc -gdwarf-2 -obasic-s main.c scanner.yy.c parser.tab.c slist.c -lgc
+all: $(SOURCES)
+	gcc -gdwarf-2 -obasic-s $(SOURCES) -lgc
 
 
 scanner.yy.c: scanner.l
