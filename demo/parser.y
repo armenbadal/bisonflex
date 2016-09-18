@@ -8,8 +8,6 @@ static int yyerror( const char* );
 extern int yylineno;
 %}
 
-%error-verbose
-
 %token xIdent
 %token xNumber
 
@@ -44,14 +42,8 @@ extern int yylineno;
 %start Program
 %%
 Program
-    : OptionalNewLines FunctionList xEof
-	{
-	  puts("PARSED");
-	  return 0;
-	}
+    : FunctionList xEof
 	;
-
-OptionalNewLines : NewLines | /* empty */ ;
 
 FunctionList
     : FunctionList Function
@@ -153,7 +145,7 @@ Expression
 
 static int yyerror( const char* message )
 {
-  fprintf(stderr, "ERROR: (%d) %s\n", yylineno, message);
+  fprintf(stderr, "ՍԽԱԼ։ %s\n", message);
   return 1;
 }
 
