@@ -5,15 +5,15 @@
 #include "slist.h"
 
 /**/
-struct node* create_node( void* vl )
+node* create_node( void* vl )
 {
-  struct node* res = GC_MALLOC(sizeof(struct node));
+  node* res = GC_MALLOC(sizeof(node));
   res->data = vl; res->next = NULL;
   return res;
 }
 
 /**/
-struct node* append_to( struct node* nd, void* vl )
+node* append_to( node* nd, void* vl )
 {
   if( NULL == nd )
 	return create_node(vl);

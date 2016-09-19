@@ -8,6 +8,8 @@ static int yyerror( const char* );
 extern int yylineno;
 %}
 
+%error-verbose
+
 %token xIdent
 %token xNumber
 

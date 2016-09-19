@@ -2,13 +2,14 @@
 #ifndef SLIST_H
 #define SLIST_H
 
-struct node {
+typedef struct _node node;
+struct _node {
   void* data;
-  struct node* next;
+  node* next;
 };
 
-extern struct node* create_node( void* vl );
-extern struct node* append_to( struct node* nd, void* vl );
+extern node* create_node( void* vl );
+extern node* append_to( node* nd, void* vl );
 
 #endif
 

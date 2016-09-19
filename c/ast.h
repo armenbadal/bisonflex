@@ -7,10 +7,12 @@
 #include "slist.h"
 
 /**/
-struct function;
+//struct function;
+typedef struct _function function;
 
 /**/
-struct expression {
+typedef struct _expression expression;
+struct _expression {
   enum {
 	NUMBER,
 	VARIABLE,
@@ -19,82 +21,94 @@ struct expression {
 	APPLY,
   } kind;
   double number;
-  char* ident;
+  char* name;
   enum {
 	OR, AND, EQ, NE, GT, GE,
 	LT, LE, ADD, SUB, MUL,
 	DIV, POW, NOT, NEG 
   } oper;
-  struct expression* exo;
-  struct expression* exi;
-  struct function* func;
-  struct node* exs;
+  expression* exo;
+  expression* exi;
+  function* func;
+  node* exs;
 };
 
-/*
-extern struct expression* create_number( double );
-extern struct expression* create_variable( const char* );
-extern struct expression* create_unary( int, struct expression* );
-extern struct expression* create_binary( int, struct expression*, struct expression* );
-extern struct expression* create_apply( struct function*, struct node* );
-*/
+extern expression* create_number( double );
+extern expression* create_variable( const char* );
+extern expression* create_unary( int, expression* );
+extern expression* create_binary( int, expression*, expression* );
+extern expression* create_apply( function*, node* );
 
-extern void expression_as_lisp( struct expression*, FILE* );
+extern void expression_as_lisp( expression*, FILE* );
 
 /**/
-struct statement;
+//struct _statement;
+typedef struct _statement statement;
 
 /**/
-struct input_s {
+typedef struct _input_s input_s;
+struct _input_s {
   char* vari;
 };
+extern statement* create_input( const char* );
 
 /**/
-struct print_s {
-  struct expression* valu;
+typedef struct _print_s print_s;
+struct _print_s {
+  expression* valu;
 };
+extern statement* create_print( expression* );
 
 /**/
-struct assignment_s {
+typedef struct _assign_s assign_s;
+struct _assign_s {
   char* vari;
-  struct expression* valu;
+  expression* valu;
 };
+extern statement* create_assign( const char*, expression* );
 
 /**/
-struct if_s {
-  struct expression* cond;
-  struct statement* thenp;
-  struct statement* elsep;
+typedef struct _if_s if_s;
+struct _if_s {
+  expression* cond;
+  statement* thenp;
+  statement* elsep;
 };
+extern statement* create_if( expression*, statement*, statement* );
 
 /**/
-struct for_s {
+typedef struct _for_s for_s;
+struct _for_s {
   char* param;
-  struct expression* start;
-  struct expression* stop;
-  struct expression* step;
-  struct statement* body;
+  expression* start;
+  expression* stop;
+  expression* step;
+  statement* body;
 };
 
 /**/
-struct while_s {
-  struct expression* cond;
-  struct statement* body;
+typedef struct _while_s while_s;
+struct _while_s {
+  expression* cond;
+  statement* body;
 };
 
 /**/
-struct call_s {
-  struct function* func;
-  struct node* argus;
+typedef struct _call_s call_s;
+struct _call_s {
+  function* func;
+  node* argus;
 };
 
 /**/
-struct sequence_s {
-  struct node* elems;
+typedef struct _sequence_s sequence_s;
+struct _sequence_s {
+  node* elems;
 };
 
 /**/
-struct statement {
+typedef struct _statement statement;
+struct _statement {
   enum {
 	INPUT, PRINT, ASSIGN, IF,
 	FOR, WHILE, CALL, SEQ,
@@ -102,23 +116,24 @@ struct statement {
   void* child;
 };
 
-extern void statement_as_lisp( struct statement*, FILE* );
+extern void statement_as_lisp( statement*, FILE* );
 
 /**/
-struct function {
+struct _function {
   char* name;
-  struct node* parameters;
-  struct statement* body;
+  node* parameters;
+  statement* body;
 };
 
-extern void function_as_lisp( struct function*, FILE* );
+extern void function_as_lisp( function*, FILE* );
 
 /**/
-struct program {
-  struct node* subs;
+typedef struct _program program;
+struct _program {
+  node* subs;
 };
 
-extern void program_as_lisp( struct program*, FILE* );
+extern void program_as_lisp( program*, FILE* );
 
 #endif
 

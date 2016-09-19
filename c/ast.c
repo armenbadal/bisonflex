@@ -1,17 +1,69 @@
 
+#include <string.h>
+
 #include <gc.h>
 
 #include "ast.h"
 
 /**/
-void expression_as_lisp( struct expression* expr, FILE* out )
+expression* create_number( double val )
+{
+  expression* expr = GC_MALLOC(sizeof(expression));
+  expr->kind = NUMBER;
+  expr->number = val;
+  return expr;
+}
+
+/**/
+expression* create_variable( const char* nm )
+{
+  expression* expr = GC_MALLOC(sizeof(expression));
+  expr->kind = VARIABLE;
+  expr->name = GC_MALLOC(1 + strlen(nm));
+  strcpy(expr->name, nm);
+  return expr;
+}
+
+/**/
+expression* create_unary( int op, expression* eo )
+{
+  expression* expr = GC_MALLOC(sizeof(expression));
+  expr->kind = UNARY;
+  expr->oper = op;
+  expr->exo = eo;
+  return expr;
+}
+
+/**/
+expression* create_binary( int op, expression* eo, expression* ei )
+{
+  expression* expr = GC_MALLOC(sizeof(expression));
+  expr->kind = BINARY;
+  expr->oper = op;
+  expr->exo = eo;
+  expr->exi = ei;
+  return expr;
+}
+
+/**/
+expression* create_apply( function* fu, node* ps )
+{
+  expression* expr = GC_MALLOC(sizeof(expression));
+  expr->kind = APPLY;
+  expr->func = fu;
+  expr->exs = ps;
+  return expr;
+}
+
+/**/
+void expression_as_lisp( expression* expr, FILE* out )
 {
   switch( expr->kind ) {
     case NUMBER:
 	  fprintf(out, "%lf", expr->number);
 	  break;
     case VARIABLE:
-	  fprintf(out, "%s", expr->ident);
+	  fprintf(out, "%s", expr->name);
 	  break;
     case UNARY:
 	  fprintf(out, "(");
@@ -79,30 +131,75 @@ void expression_as_lisp( struct expression* expr, FILE* out )
 
 
 /**/
-void statement_as_lisp( struct statement* stat, FILE* out )
+static statement* create_statement( int sk, void* chd )
+{
+  statement* stat = GC_MALLOC(sizeof(statement));
+  stat->kind = sk; stat->child = chd;
+  return stat;
+}
+  
+/**/
+statement* create_input( const char* vr )
+{
+  input_s* inp = GC_MALLOC(sizeof(input_s));
+  inp->vari = GC_MALLOC(1 + strlen(vr));
+  strcpy(inp->vari, vr);
+  return create_statement(INPUT, inp);
+}
+
+/**/
+statement* create_print( expression* ex )
+{
+  print_s* pri = GC_MALLOC(sizeof(print_s));
+  pri->valu = ex;
+  return create_statement(PRINT, pri);
+}
+
+/**/
+statement* create_assign( const char* vr, expression* vl )
+{
+  assign_s* asi = GC_MALLOC(sizeof(assign_s));
+  asi->vari = GC_MALLOC(1 + strlen(vr));
+  strcpy(asi->vari, vr);
+  asi->valu = vl;
+  return create_statement(ASSIGN, asi);
+}
+
+/**/
+statement* create_if( expression* co, statement* tp, statement* ep )
+{
+  if_s* ifp = GC_MALLOC(sizeof(if_s));
+  ifp->cond = co;
+  ifp->thenp = tp;
+  ifp->elsep = ep;
+  return create_statement(IF, ifp);
+}
+
+/**/
+void statement_as_lisp( statement* stat, FILE* out )
 {
   switch( stat->kind ) {
     case INPUT: {
-	  struct input_s* inp = (struct input_s*)stat->child;
+	  input_s* inp = (input_s*)stat->child;
 	  fprintf(out, "(read %s)", inp->vari);
 	  break;
 	}
     case PRINT: {
-	  struct print_s* prp = (struct print_s*)stat->child;
+	  print_s* prp = (print_s*)stat->child;
 	  fprintf(out, "(print ");
 	  expression_as_lisp(prp->valu, out);
 	  fprintf(out, ")");
 	  break;
 	}
     case ASSIGN: {
-	  struct assignment_s* asp = (struct assignment_s*)stat->child;
+	  assign_s* asp = (assign_s*)stat->child;
 	  fprintf(out, "(setf %s ", asp->vari);
 	  expression_as_lisp(asp->valu, out);
 	  fprintf(out, ")");
 	  break;
 	}
     case IF: {
-	  struct if_s* brp = (struct if_s*)stat->child;
+	  if_s* brp = (if_s*)stat->child;
 	  fprintf(out, "(if ");
 	  expression_as_lisp(brp->cond, out);
 	  fprintf(out, " ");
@@ -115,26 +212,26 @@ void statement_as_lisp( struct statement* stat, FILE* out )
 	  break;
 	}
     case FOR: {
-	  struct for_s* fop = (struct for_s*)stat->child;
+	  for_s* fop = (for_s*)stat->child;
 	  // param, start, stop, step, body
 	  break;
 	}
     case WHILE: {
-	  struct while_s* whp = (struct while_s*)stat->child;
+	  while_s* whp = (while_s*)stat->child;
 	  // cond, body
 	  break;
 	}
     case CALL: {
-	  struct call_s* cap = (struct call_s*)stat->child;
+	  call_s* cap = (call_s*)stat->child;
 	  // func, argus
 	  break;
 	}
     case SEQ: {
-	  struct sequence_s* sep = (struct sequence_s*)stat->child;
+	  sequence_s* sep = (sequence_s*)stat->child;
 	  fprintf(out, "(progn ");
-	  struct node* sp = (struct node*)sep->elems;
+	  node* sp = (node*)sep->elems;
 	  while( sp != NULL ) {
-		statement_as_lisp((struct statement*)sp->data, out);
+		statement_as_lisp((statement*)sp->data, out);
 		sp = sp->next;
 	  }
 	  fprintf(out, ")");
@@ -144,13 +241,13 @@ void statement_as_lisp( struct statement* stat, FILE* out )
 }
 
 /**/
-void function_as_lisp( struct function* stat, FILE* out )
+void function_as_lisp( function* stat, FILE* out )
 {
   // TODO
 }
 
 /**/
-void program_as_lisp( struct program* stat, FILE* out )
+void program_as_lisp( program* stat, FILE* out )
 {
   // TODO
 }

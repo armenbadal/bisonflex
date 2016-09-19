@@ -10,12 +10,12 @@ int main()
   char* a1 = "a1";
   char* a2 = "a2";
 
-  struct node* sli = NULL;
+  node* sli = NULL;
   sli = append_to(sli, a0);
   sli = append_to(sli, a1);
   sli = append_to(sli, a2);
 
-  struct node* p = sli;
+  node* p = sli;
   while( p != NULL ) {
 	printf("%s\n", (char*)(p->data));
 	p = p->next;
@@ -26,7 +26,7 @@ int main()
   double d1 = d0 * 2;
   double d2 = d1 * 3;
   
-  struct node* slii = NULL;
+  node* slii = NULL;
   slii = append_to(slii, &d0);
   slii = append_to(slii, &d1);
   slii = append_to(slii, &d2);
