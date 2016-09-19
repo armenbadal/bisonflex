@@ -107,8 +107,10 @@ void statement_as_lisp( struct statement* stat, FILE* out )
 	  expression_as_lisp(brp->cond, out);
 	  fprintf(out, " ");
 	  statement_as_lisp(brp->thenp, out);
-	  fprintf(out, " ");
-	  statement_as_lisp(brp->elsep, out);
+	  if( brp->elsep != NULL ) {
+		fprintf(out, " ");
+		statement_as_lisp(brp->elsep, out);
+	  }
 	  fprintf(out, ")");
 	  break;
 	}
@@ -141,4 +143,15 @@ void statement_as_lisp( struct statement* stat, FILE* out )
   }
 }
 
+/**/
+void function_as_lisp( struct function* stat, FILE* out )
+{
+  // TODO
+}
+
+/**/
+void program_as_lisp( struct program* stat, FILE* out )
+{
+  // TODO
+}
 

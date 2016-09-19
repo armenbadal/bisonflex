@@ -84,6 +84,19 @@ void test_statement_as_lisp()
   statement_as_lisp(st1, stdout);
   puts("");
 
+  // case 2
+  struct statement* st2 = malloc(sizeof(struct statement));
+  st2->kind = ASSIGN;
+  struct assignment_s* ase = malloc(sizeof(struct assignment_s));
+  ase->vari = malloc(32);
+  strcpy(ase->vari, "xyz");
+  ase->valu = malloc(sizeof(struct expression));
+  ase->valu->kind = NUMBER;
+  ase->valu->number = 3.14;
+  st2->child = ase;
+
+  statement_as_lisp(st2, stdout);
+  puts("");
 }
 
 /**/

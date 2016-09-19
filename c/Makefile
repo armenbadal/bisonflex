@@ -11,10 +11,13 @@ scanner.yy.c: scanner.l
 parser.tab.c parser.tab.h: parser.y
 	bison -d parser.y
 
+test_ast:
+	gcc -otest_ast ast.c test_ast.c
 
 clean:
 	rm -f *.tab.*
 	rm -f *.yy.c
 	rm -f *.o
 	rm -f basic-s
+	rm -f test_ast
 
