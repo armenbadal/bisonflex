@@ -14,7 +14,7 @@ struct expression {
   enum {
 	NUMBER,
 	VARIABLE,
-	UNRY,
+	UNARY,
 	BINARY,
 	APPLY,
   } kind;
@@ -45,18 +45,18 @@ extern void expression_as_lisp( struct expression*, FILE* );
 struct statement;
 
 /**/
-struct assignment_s {
-  char* vari;
-  struct expression* valu;
-};
-
-/**/
 struct input_s {
   char* vari;
 };
 
 /**/
 struct print_s {
+  struct expression* valu;
+};
+
+/**/
+struct assignment_s {
+  char* vari;
   struct expression* valu;
 };
 
@@ -90,17 +90,16 @@ struct call_s {
 
 /**/
 struct sequence_s {
-  struct statement* left;
-  struct statement* right;
+  struct node* elems;
 };
 
 /**/
 struct statement {
   enum {
-	ASSIGN, INPUT, PRINT, IF,
+	INPUT, PRINT, ASSIGN, IF,
 	FOR, WHILE, CALL, SEQ,
   } kind;
-  void* stat;
+  void* child;
 };
 
 extern void statement_as_lisp( struct statement*, FILE* );
