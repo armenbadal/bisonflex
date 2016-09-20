@@ -37,13 +37,21 @@ static int yyerror( const char* );
 %right xNot
 
 %token xEol
-%token xEof
+%token xEof 0
 
 %start Program
 %%
 Program
-    : FunctionList xEof
+    : NewLinesOpt FunctionList xEof
+	{ 
+	  puts("PARSED"); 
+	}
 	;
+
+NewLinesOpt
+    : NewLines
+    | /* empty */
+    ;
 
 FunctionList
     : FunctionList Function
@@ -82,14 +90,14 @@ StatementList
 Statement
     : xInput xIdent
 	| xPrint Expression
-	| OptionalLet xIdent xEq Expression
+	| LetOpt xIdent xEq Expression
 	| xIf Expression xThen NewLines StatementList ElseIfPartList ElsePart xEnd xIf
-	| xFor xIdent xEq Expression xTo Expression OptionalStep NewLines StatementList xEnd xFor
+	| xFor xIdent xEq Expression xTo Expression StepOpt NewLines StatementList xEnd xFor
 	| xWhile Expression NewLines StatementList xEnd xWhile
 	| xCall xIdent ArgumentList
 	;
 
-OptionalLet
+LetOpt
     : xLet
 	| /* empty */
 	;
@@ -104,7 +112,7 @@ ElsePart
 	| /* empty */
 	;
 
-OptionalStep
+StepOpt
     : xStep Expression
 	| /* empty */
 	;
