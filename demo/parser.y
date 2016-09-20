@@ -4,8 +4,6 @@
 
 extern int yylex();
 static int yyerror( const char* );
- 
-extern int yylineno;
 %}
 
 %error-verbose
@@ -147,7 +145,8 @@ Expression
 
 static int yyerror( const char* message )
 {
-  fprintf(stderr, "ՍԽԱԼ։ %s\n", message);
+  extern int yylineno;
+  fprintf(stderr, "ՍԽԱԼ։ [%d] %s\n", yylineno, message);
   return 1;
 }
 
