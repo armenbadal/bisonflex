@@ -59,83 +59,83 @@ expression* create_apply( function* fu, node* ps )
 void expression_as_lisp( expression* expr, FILE* out )
 {
   if( expr == NULL )
-	return;
+    return;
   
   switch( expr->kind ) {
     case NUMBER:
-	  fprintf(out, "%lf", expr->number);
-	  break;
+      fprintf(out, "%lf", expr->number);
+      break;
     case VARIABLE:
-	  fprintf(out, "%s", expr->name);
-	  break;
+      fprintf(out, "%s", expr->name);
+      break;
     case UNARY:
-	  fprintf(out, "(");
-	  if( NEG == expr->oper )
-		fprintf(out, "basic-neg ");
-	  else if( NOT == expr->oper )
-		fprintf(out, "basic-not ");
-	  expression_as_lisp(expr->exo, out);
-	  fprintf(out, ")");
-	  break;
+      fprintf(out, "(");
+      if( NEG == expr->oper )
+        fprintf(out, "basic-neg ");
+      else if( NOT == expr->oper )
+        fprintf(out, "basic-not ");
+      expression_as_lisp(expr->exo, out);
+      fprintf(out, ")");
+      break;
     case BINARY:
-	  fprintf(out, "(");
-	  switch( expr->oper ) {
-	    case OR:
-		  fprintf(out, "basic-or");
-		  break;
-	    case AND:
-		  fprintf(out, "basic-and");
-		  break;
-	    case EQ:
-		  fprintf(out, "basic-eq");
-		  break;
-	    case NE:
-		  fprintf(out, "basic-ne");
-		  break;
-	    case GT:
-		  fprintf(out, "basic-gt");
-		  break;
-	    case GE:
-		  fprintf(out, "basic-ge");
-		  break;
-	    case LT:
-		  fprintf(out, "basic-lt");
-		  break;
-	    case LE:
-		  fprintf(out, "basic-le");
-		  break;
-	    case ADD:
-		  fprintf(out, "basic-add");
-		  break;
-	    case SUB:
-		  fprintf(out, "basic-sub");
-		  break;
-	    case MUL:
-		  fprintf(out, "basic-mul");
-		  break;
-	    case DIV:
-		  fprintf(out, "basic-div");
-		  break;
-	    case POW:
-		  fprintf(out, "basic-pow");
-		  break;
-	  }
-	  fprintf(out, " ");
-	  expression_as_lisp(expr->exo, out);
-	  fprintf(out, " ");
-	  expression_as_lisp(expr->exi, out);
-	  fprintf(out, ")");
-	  break;
+      fprintf(out, "(");
+      switch( expr->oper ) {
+        case OR:
+          fprintf(out, "basic-or");
+          break;
+        case AND:
+          fprintf(out, "basic-and");
+          break;
+        case EQ:
+          fprintf(out, "basic-eq");
+          break;
+        case NE:
+          fprintf(out, "basic-ne");
+          break;
+        case GT:
+          fprintf(out, "basic-gt");
+          break;
+        case GE:
+          fprintf(out, "basic-ge");
+          break;
+        case LT:
+          fprintf(out, "basic-lt");
+          break;
+        case LE:
+          fprintf(out, "basic-le");
+          break;
+        case ADD:
+          fprintf(out, "basic-add");
+          break;
+        case SUB:
+          fprintf(out, "basic-sub");
+          break;
+        case MUL:
+          fprintf(out, "basic-mul");
+          break;
+        case DIV:
+          fprintf(out, "basic-div");
+          break;
+        case POW:
+          fprintf(out, "basic-pow");
+          break;
+      }
+      fprintf(out, " ");
+      expression_as_lisp(expr->exo, out);
+      fprintf(out, " ");
+      expression_as_lisp(expr->exi, out);
+      fprintf(out, ")");
+      break;
     case APPLY: {
-	  fprintf(out, "(basic-apply %s ", expr->func->name);
-	  node* ip = expr->exs;
-	  while( ip != NULL ) {
-		expression_as_lisp((expression*)(ip->data), out);
-		ip = ip->next;
-	  }
-	  fprintf(out, ")");
-	  break;
-	}
+      fprintf(out, "(basic-apply %s ", expr->func->name);
+      node* ip = expr->exs;
+      while( ip != NULL ) {
+        expression_as_lisp((expression*)(ip->data), out);
+        ip = ip->next;
+      }
+      fprintf(out, ")");
+      break;
+    }
   }
 }
 
@@ -228,85 +228,85 @@ statement* create_sequence( node* el )
 void statement_as_lisp( statement* stat, FILE* out )
 {
   if( stat == NULL )
-	return;
+    return;
   
   switch( stat->kind ) {
     case INPUT: {
-	  input_s* inp = (input_s*)stat->child;
-	  fprintf(out, "(basic-input %s) ", inp->vari);
-	  break;
-	}
+      input_s* inp = (input_s*)stat->child;
+      fprintf(out, "(basic-input %s) ", inp->vari);
+      break;
+    }
     case PRINT: {
-	  print_s* prp = (print_s*)stat->child;
-	  fprintf(out, "(basic-print ");
-	  expression_as_lisp(prp->valu, out);
-	  fprintf(out, ") ");
-	  break;
-	}
+      print_s* prp = (print_s*)stat->child;
+      fprintf(out, "(basic-print ");
+      expression_as_lisp(prp->valu, out);
+      fprintf(out, ") ");
+      break;
+    }
     case ASSIGN: {
-	  assign_s* asp = (assign_s*)stat->child;
-	  fprintf(out, "(basic-assign %s ", asp->vari);
-	  expression_as_lisp(asp->valu, out);
-	  fprintf(out, ") ");
-	  break;
-	}
+      assign_s* asp = (assign_s*)stat->child;
+      fprintf(out, "(basic-assign %s ", asp->vari);
+      expression_as_lisp(asp->valu, out);
+      fprintf(out, ") ");
+      break;
+    }
     case IF: {
-	  if_s* brp = (if_s*)stat->child;
-	  fprintf(out, "(basic-if ");
-	  expression_as_lisp(brp->cond, out);
-	  fprintf(out, " ");
-	  statement_as_lisp(brp->thenp, out);
-	  if( brp->elsep != NULL ) {
-		fprintf(out, " ");
-		statement_as_lisp(brp->elsep, out);
-	  }
-	  fprintf(out, ") ");
-	  break;
-	}
+      if_s* brp = (if_s*)stat->child;
+      fprintf(out, "(basic-if ");
+      expression_as_lisp(brp->cond, out);
+      fprintf(out, " ");
+      statement_as_lisp(brp->thenp, out);
+      if( brp->elsep != NULL ) {
+        fprintf(out, " ");
+        statement_as_lisp(brp->elsep, out);
+      }
+      fprintf(out, ") ");
+      break;
+    }
     case FOR: {
-	  for_s* fop = (for_s*)stat->child;
-	  fprintf(out, "(basic-for %s ", fop->param);
-	  expression_as_lisp(fop->start, out);
-	  fprintf(out, " ");
-	  expression_as_lisp(fop->stop, out);
-	  fprintf(out, " ");
-	  expression_as_lisp(fop->step, out);
-	  fprintf(out, " ");
-	  statement_as_lisp(fop->body, out);
-	  fprintf(out, ") ");
-	  break;
-	}
+      for_s* fop = (for_s*)stat->child;
+      fprintf(out, "(basic-for %s ", fop->param);
+      expression_as_lisp(fop->start, out);
+      fprintf(out, " ");
+      expression_as_lisp(fop->stop, out);
+      fprintf(out, " ");
+      expression_as_lisp(fop->step, out);
+      fprintf(out, " ");
+      statement_as_lisp(fop->body, out);
+      fprintf(out, ") ");
+      break;
+    }
     case WHILE: {
-	  while_s* whp = (while_s*)stat->child;
-	  fprintf(out, "(basic-while ");
-	  expression_as_lisp(whp->cond, out);
-	  fprintf(out, " ");
-	  statement_as_lisp(whp->body, out);
-	  fprintf(out, ") ");
-	  break;
-	}
+      while_s* whp = (while_s*)stat->child;
+      fprintf(out, "(basic-while ");
+      expression_as_lisp(whp->cond, out);
+      fprintf(out, " ");
+      statement_as_lisp(whp->body, out);
+      fprintf(out, ") ");
+      break;
+    }
     case CALL: {
-	  call_s* cap = (call_s*)stat->child;
-	  fprintf(out, "(basic-call %s ", cap->func->name);
-	  node* ip = cap->argus;
-	  while( ip != NULL ) {
-		expression_as_lisp((expression*)(ip->data), out);
-		ip = ip->next;
-	  }
-	  fprintf(out, ") ");
-	  break;
-	}
+      call_s* cap = (call_s*)stat->child;
+      fprintf(out, "(basic-call %s ", cap->func->name);
+      node* ip = cap->argus;
+      while( ip != NULL ) {
+        expression_as_lisp((expression*)(ip->data), out);
+        ip = ip->next;
+      }
+      fprintf(out, ") ");
+      break;
+    }
     case SEQ: {
-	  sequence_s* sep = (sequence_s*)stat->child;
-	  fprintf(out, "(basic-seq ");
-	  node* sp = sep->elems;
-	  while( sp != NULL ) {
-		statement_as_lisp((statement*)(sp->data), out);
-		sp = sp->next;
-	  }
-	  fprintf(out, ")");
-	  break;
-	}
+      sequence_s* sep = (sequence_s*)stat->child;
+      fprintf(out, "(basic-seq ");
+      node* sp = sep->elems;
+      while( sp != NULL ) {
+        statement_as_lisp((statement*)(sp->data), out);
+        sp = sp->next;
+      }
+      fprintf(out, ")");
+      break;
+    }
   }
 }
 
@@ -327,9 +327,9 @@ void function_as_lisp( function* subr, FILE* out )
   fprintf(out, "(basic-function %s ( ", subr->name);
   node* ip = subr->parameters;
   while( ip != NULL ) {
-	expression_as_lisp((expression*)(ip->data), out);
-	fprintf(out, " ");
-	ip = ip->next;
+    expression_as_lisp((expression*)(ip->data), out);
+    fprintf(out, " ");
+    ip = ip->next;
   }
   fprintf(out, ") ");
   statement_as_lisp(subr->body, out);
@@ -341,9 +341,9 @@ void program_as_lisp( program* pro, FILE* out )
 {
   node* ip = pro->subrs;
   while( ip != NULL ) {
-	function_as_lisp((function*)(ip->data), out);
-	fprintf(out, "\n");
-	ip = ip->next;
+    function_as_lisp((function*)(ip->data), out);
+    fprintf(out, "\n");
+    ip = ip->next;
   }
 }
 

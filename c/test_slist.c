@@ -17,8 +17,8 @@ int main()
 
   node* p = sli;
   while( p != NULL ) {
-	printf("%s\n", (char*)(p->data));
-	p = p->next;
+    printf("%s\n", (char*)(p->data));
+    p = p->next;
   }
 
   /* Test 1 */
@@ -33,8 +33,8 @@ int main()
   
   p = slii;
   while( p != NULL ) {
-	printf("%lf\n", *((double*)(p->data)));
-	p = p->next;
+    printf("%lf\n", *((double*)(p->data)));
+    p = p->next;
   }
   
   return 0;

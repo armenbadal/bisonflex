@@ -135,7 +135,7 @@ Statement → IF Expression THEN NewLines StatementList ElseIfPartList ElsePart 
 ElseIfPartList → ElseIfPartList ELSEIF Expression THEN NewLines StatementList
                | ε
 ElsePart → ELSE StatementList
-		 | ε
+         | ε
 ````
 
 Պարամետրով ցիկլի հրամանը սկսվում է `FOR` ծառայողական բառով, որին հաջորդում են ցիկլի պարամետրի իդենտիֆիկատորը, `=` նիշը, պարամետրի սկզբնական արժեքը որոշող արտահայտությունը, `TO` բառը, պարամետրի արժեքի վերին սահմանի արտահայտությունը, `STEP` բառը, պարամետրի քայլը որոշող արտահայտությունը, նոր տողի նիշեր, ցիկլի մարմինը որոշող հրամանների ցուցակ։ Պարամետրով ցիկլի հրամանն ավարտվում է `END` և `FOR` բառերով։
@@ -182,8 +182,8 @@ Factor         → IDENT '(' ArgumentList ')'
                | '(' Expression ')'
                | '-' Factor
                | NOT Factor
-			   | NUMBER
-			   | IDENT
+               | NUMBER
+               | IDENT
 ````
 
 Ես այստեղ շեղվեցի BNF֊ի սովորական գրառումից, պարզապես ցույց տալու համար արտահայտություններում հանդիպող գործողությունների բաշխականությունն ու նախապատվությունը։ Սակայն Bison֊ը հնարավորություն է տալիս նույն հասկացությունների սահմանել ավելի հարմր մեխանիզմներով։ Այդ մասին՝ իր տեղում։
@@ -236,25 +236,25 @@ Yacc֊ի և GNU Bison֊ի մուտքին տրվող ֆայլը սովորաբա�
 ````
 Expression
     : Expression xOr Expression
-	| Expression xAnd Expression
-	| Expression xEq Expression
-	| Expression xNe Expression
-	| Expression xGt Expression
-	| Expression xGe Expression
-	| Expression xLt Expression
-	| Expression xLe Expression
-	| Expression xAdd Expression
-	| Expression xSub Expression
-	| Expression xMul Expression
-	| Expression xDiv Expression
-	| Expression xPow Expression
-	| '(' Expression ')'
-	| xIdent '(' ArgumentList ')'
-	| '-' Expression %prec xNot
-	| xNot Expression
-	| xNumber
-	| xIdent
-	;
+    | Expression xAnd Expression
+    | Expression xEq Expression
+    | Expression xNe Expression
+    | Expression xGt Expression
+    | Expression xGe Expression
+    | Expression xLt Expression
+    | Expression xLe Expression
+    | Expression xAdd Expression
+    | Expression xSub Expression
+    | Expression xMul Expression
+    | Expression xDiv Expression
+    | Expression xPow Expression
+    | '(' Expression ')'
+    | xIdent '(' ArgumentList ')'
+    | '-' Expression %prec xNot
+    | xNot Expression
+    | xNumber
+    | xIdent
+    ;
 ````
 
 Ոչ մի արտասովոր բան․ պարզապես բոլոր նախատեսված գործողությունների համար նշված է, թե նրանց օպերանդ֊արտահայտությունները ինչ շարահյուսական դիրքում են գտնվում գործողության նշանի նկատմամբ։ Միայն հետևյալ կանոնն է մի քիչ անսովոր․
@@ -266,7 +266,7 @@ Expression : ...
 
 բայց դրա բացատրությունն էլ է պարզ։ Այստեղ `%prec` հրահանգով նշված է, որ բացասման (ունար մինուս) գործողությունը պետք է ունենա նույն բաշխականությունը, ինչ որ ժխտման `NOT` գործողությունը։
 
-Մի քիչ առաջ անցնելով նշեմ, որ Bison֊ի ամեն մի քերեկանական կանոնին (իսկ ավելի ճիշտ՝ կանոնի աջ մասի ամեն մի տարրին) կարելի է համապատասխանեցնել գործողություն (action)` C կոդի բլոկ։ Օրինակ, Բեյսիկ լեզվի քերականության կանոնը Bison֊ի համար կարելի է գրել․
+Մի քիչ առաջ անցնելով նշեմ, որ Bison֊ի ամեն մի քերեկանական կանոնին (իսկ ավելի ճիշտ՝ կանոնի աջ մասի ամեն մի տարրին) կարելի է համապատասխանեցնել գործողություն (action)՝ C կոդի բլոկ։ Օրինակ, Բեյսիկ լեզվի քերականության կանոնը Bison֊ի համար կարելի է գրել․
 
 ````
 Program
@@ -274,7 +274,7 @@ Program
     {
       puts("PARSED");
     }
-	;
+    ;
 ````
 
 Սա նշանակում է, որ ֆունկցիաների ցուցակի վերլուծությունից հետո պետք է արտածել `PARSED` բառը։
@@ -293,13 +293,13 @@ expr.y:31.22-33: error: symbol ArgumentList is used, but is not defined as a tok
 ````
 ArgumentList
     : ExpressionList
-	| /* empty */
-	;
+    | /* empty */
+    ;
 
 ExpressionList
     : ExpressionList ',' Expression
-	| Expression
-	;
+    | Expression
+    ;
 ````
 
 Նշեմ, որ `.y` ֆայլերում դատարկ կանոն սահմանելու հատուկ սիմվոլ, ինչպիսին BNF֊ում ε տառն է, չկա։ Պարզապես պետք է կանոնի աջ մասը դատարկ թողնել։ Ես օգտագործում եմ `/* empty */` (երբեմն էլ՝ `/* epsilon */`) մեկնաբանությունը, որպեսզի ավելի հեշտ գտնեմ դատարկ կանոնները։ _((վերախմբագրել `%empty`֊ի համար))_
@@ -350,103 +350,103 @@ ExpressionList
 %%
 Program
     : FunctionList
-	;
+    ;
 
 FunctionList
     : FunctionList Function
-	| /* empty */
-	;
+    | /* empty */
+    ;
 
 Function
     : xDeclare FunctionHeader
     | FunctionHeader StatementList xEnd xFunction NewLines
-	;
+    ;
 
 FunctionHeader
     : xFunction xIdent '(' ParameterList ')' NewLines
-	;
+    ;
 
 ParameterList
     : IdentifierList
-	| /* empty */
-	;
+    | /* empty */
+    ;
 
 NewLines
     : NewLines xEol
-	| xEol
-	;
+    | xEol
+    ;
 
 IdentifierList
     : IdentifierList ',' xIdent
-	| xIdent
-	;
+    | xIdent
+    ;
 
 StatementList
     : StatementList Statement NewLines
-	| /* empty */
-	;
+    | /* empty */
+    ;
 
 Statement
     : xInput xIdent
-	| xPrint Expression
-	| LetOpt xIdent xEq Expression
-	| xIf Expression xThen NewLines StatementList ElseIfPartList ElsePart xEnd xIf
-	| xFor xIdent xEq Expression xTo Expression StepOpt NewLines StatementList xEnd xFor
-	| xWhile Expression NewLines StatementList xEnd xWhile
-	| xCall xIdent ArgumentList
-	;
+    | xPrint Expression
+    | LetOpt xIdent xEq Expression
+    | xIf Expression xThen NewLines StatementList ElseIfPartList ElsePart xEnd xIf
+    | xFor xIdent xEq Expression xTo Expression StepOpt NewLines StatementList xEnd xFor
+    | xWhile Expression NewLines StatementList xEnd xWhile
+    | xCall xIdent ArgumentList
+    ;
 
 LetOpt
     : xLet
-	| /* empty */
-	;
+    | /* empty */
+    ;
 
 ElseIfPartList
     : ElseIfPartList xElseIf Expression xThen NewLines StatementList
-	| /* empty */
-	;
+    | /* empty */
+    ;
 
 ElsePart
     : xElse NewLines StatementList
-	| /* empty */
-	;
+    | /* empty */
+    ;
 
 StepOpt
     : xStep Expression
-	| /* empty */
-	;
+    | /* empty */
+    ;
 
 ArgumentList
     : ExpressionList
-	| /* empty */
-	;
+    | /* empty */
+    ;
 
 ExpressionList
     : ExpressionList ',' Expression
-	| Expression
-	;
+    | Expression
+    ;
 
 Expression
     : Expression xOr Expression
-	| Expression xAnd Expression
-	| Expression xEq Expression
-	| Expression xNe Expression
-	| Expression xGt Expression
-	| Expression xGe Expression
-	| Expression xLt Expression
-	| Expression xLe Expression
-	| Expression xAdd Expression
-	| Expression xSub Expression
-	| Expression xMul Expression
-	| Expression xDiv Expression
-	| Expression xPow Expression
-	| '(' Expression ')'
-	| xIdent '(' ArgumentList ')'
-	| xSub Expression %prec xNot
-	| xNot Expression
-	| xNumber
-	| xIdent
-	;
+    | Expression xAnd Expression
+    | Expression xEq Expression
+    | Expression xNe Expression
+    | Expression xGt Expression
+    | Expression xGe Expression
+    | Expression xLt Expression
+    | Expression xLe Expression
+    | Expression xAdd Expression
+    | Expression xSub Expression
+    | Expression xMul Expression
+    | Expression xDiv Expression
+    | Expression xPow Expression
+    | '(' Expression ')'
+    | xIdent '(' ArgumentList ')'
+    | xSub Expression %prec xNot
+    | xNot Expression
+    | xNumber
+    | xIdent
+    ;
 ````
 
 Նորություն է միայն ֆայլի առաջին բաժնի վերջում գրված `%start Program` հրահանգը։ Սրանով նշվում է, որ սահմանված քերականության սկզբնական սիմվոլը `Program` ոչ տերմինալային սիմվոլն է։ 
@@ -782,11 +782,11 @@ FunctionList
 Function
     : xDeclare FunctionHeader
     | FunctionHeader StatementList xEnd xFunction NewLines
-	;
+    ;
 
 FunctionHeader
     : xFunction xIdent '(' ParameterList ')' NewLines
-	;
+    ;
 ````
 
 Իսկ թեսթային օրինակում `Main()` ֆուկցիայի սահմանմանը նախորդում են մեկնաբանություններ և դատարկ տող։ Մեկնաբանություններն ու բացատանիշերն անտեսվում են բառային վերլոծիչի կողմից։ Մնում են նոր տողի նիշերը։
@@ -796,7 +796,7 @@ FunctionHeader
 ````
 Program
     : NewLinesOpt FunctionList
-	;
+    ;
 
 NewLinesOpt
     : NewLines
@@ -830,10 +830,10 @@ END FUNCTION
 FUNCTION Gcd(n, m)
   WHILE n <> m 
     IF n > n THEN
-	  n = n - m
-	ELSE
-	  m = m - n
-	END IF
+      n = n - m
+    ELSE
+      m = m - n
+    END IF
   END WHILE
   LET Gcd = n
 END FUNCTION
@@ -1021,7 +1021,7 @@ FUNCTION Main()
   LET a = 100
   WHILE a > 0
     PRINT a
-	a = a - 1
+    a = a - 1
   END WHILE
 END FUNCTION
 ````
@@ -1052,28 +1052,76 @@ _Ի՞նչ է մնում անելու։_ Նախ՝ պետք է իրականացն�
 /* արտահայտություններ */
 typedef struct _expression expression;
 struct _expression {
+  // արտահայտության տեսակը
   enum {
-	NUMBER,
-	VARIABLE,
-	UNARY,
-	BINARY,
-	APPLY,
+    NUMBER,
+    VARIABLE,
+    UNARY,
+    BINARY,
+    APPLY,
   } kind;
-  double number;
-  char* name;
+  double number; // իրական թիվ
+  char* name; // իդենտիֆիկատոր
+  // գործողությունների կոդերը
   enum {
-	OR, AND, EQ, NE, GT, GE,
-	LT, LE, ADD, SUB, MUL,
-	DIV, POW, NOT, NEG 
+    OR, AND, EQ, NE, GT, GE,
+    LT, LE, ADD, SUB, MUL,
+    DIV, POW, NOT, NEG 
   } oper;
-  expression* exo;
-  expression* exi;
-  function* func;
-  node* exs;
+  expression* exo; // ենթաարտահայտություն
+  expression* exi; // ենթաարտահայտություն
+  function* func; // կիրառվող ֆունկցիա
+  node* exs; // ֆունկցիայի կիրառման պարամետրեր
 };
 ````
 
+Արտահայտության հինգ ենթատիպերի համար նախատեսված են համապատասխան կոնստրուկտորները։
 
+````c
+extern expression* create_number( double );
+extern expression* create_variable( const char* );
+extern expression* create_unary( int, expression* );
+extern expression* create_binary( int, expression*, expression* );
+extern expression* create_apply( function*, node* );
+````
+
+Արտահայտությունները Լիսպ ներկայացման թարգմանելու համար է `expression_as_lisp()` ֆունկցիան։ Սրա առաջին արգումենտը արտահայտության ցուցիչն է, իսկ երկրորդը՝ արտածման ֆայլային հոսքինը։
+
+````c
+extern void expression_as_lisp( expression*, FILE* );
+````
+
+Հրամանների ենթատեսակները ութն են. _ներմուծում_, _արտածում_, _վերագրում_, _ճյուղավորում_, _պարամետրով ցիկլ_, _նախապայմանով ցիկլ_, _պրոցեդուրայի կանչ_ և _հրամանների հաջորդում_։ Կառուցվածքային բազմազանության պատճառով չուզեցի բոլոր հրամանների համար սահմանել մեկ ստրուկտուրա (ինչպես դա արել եմ արտահայտությունների համար)։ Փոխարենը սահմանել եմ `_statement` ստրուկտուրան՝ `kind` տեսակի դաշտով, և կոնկրետ հրամանի `child` ունիվերսալ ցուցիչը։
+
+````c
+/* հրամաններ */
+typedef struct _statement statement;
+struct _statement {
+  // հրամանի տեսակը
+  enum {
+    INPUT, PRINT, ASSIGN, IF,
+    FOR, WHILE, CALL, SEQ,
+  } kind;
+  void* child; // հրամանի ցուցիչ
+};
+````
+
+Հրամանն էլ Լիսպ ներկայացման է թարգմանվում `statement_as_lisp()` ֆունկցիայով։
+
+````c
+extern void statement_as_lisp( statement*, FILE* );
+````
+
+Ներմուծման հրամանը ունի միայն փոփոխականի անունը պարունակող `vari` դաշտը։ `create_input` կոնստրուկտորը ստեղծում և վերադարձնում է ներմուծման հրամանի նմուշը։
+
+````c
+/* ներմուծում */
+typedef struct _input_s input_s;
+struct _input_s {
+  char* vari;
+};
+extern statement* create_input( const char* );
+````
 
 Բեյսիկ լեզվի ֆունկցիան բաղկացած է ֆունկցիայի անունից, պարամետրերի ցուցակից և մարմնի հրամաններից։ `_function` ստրուկտուրան
 

@@ -7,43 +7,55 @@
 #include "slist.h"
 
 /**/
-//struct function;
 typedef struct _function function;
 
-/**/
+/* արտահայտություններ */
 typedef struct _expression expression;
 struct _expression {
+  // արտահայտության տեսակը
   enum {
-	NUMBER,
-	VARIABLE,
-	UNARY,
-	BINARY,
-	APPLY,
+    NUMBER,
+    VARIABLE,
+    UNARY,
+    BINARY,
+    APPLY,
   } kind;
-  double number;
-  char* name;
+  double number; // իրական թիվ
+  char* name; // իդենտիֆիկատոր
+  // գործողությունների կոդերը
   enum {
-	OR, AND, EQ, NE, GT, GE,
-	LT, LE, ADD, SUB, MUL,
-	DIV, POW, NOT, NEG 
+    OR, AND, EQ, NE, GT, GE,
+    LT, LE, ADD, SUB, MUL,
+    DIV, POW, NOT, NEG 
   } oper;
-  expression* exo;
-  expression* exi;
-  function* func;
-  node* exs;
+  expression* exo; // ենթաարտահայտություն
+  expression* exi; // ենթաարտահայտություն
+  function* func; // կիրառվող ֆունկցիա
+  node* exs; // ֆունկցիայի կիրառման պարամետրեր
 };
 
+/* կոնստրուկտորներ */
 extern expression* create_number( double );
 extern expression* create_variable( const char* );
 extern expression* create_unary( int, expression* );
 extern expression* create_binary( int, expression*, expression* );
 extern expression* create_apply( function*, node* );
 
+/* արտահայտության թարգմանությունը */
 extern void expression_as_lisp( expression*, FILE* );
 
-/**/
-//struct _statement;
+/* հրամաններ */
 typedef struct _statement statement;
+struct _statement {
+  // հրամանի տեսակը
+  enum {
+    INPUT, PRINT, ASSIGN, IF,
+    FOR, WHILE, CALL, SEQ,
+  } kind;
+  void* child; // հրամանի ցուցիչ
+};
+
+extern void statement_as_lisp( statement*, FILE* );
 
 /**/
 typedef struct _input_s input_s;
@@ -87,7 +99,6 @@ struct _for_s {
 };
 extern statement* create_for( const char*, expression*, expression*, expression*, statement* );
 
-
 /**/
 typedef struct _while_s while_s;
 struct _while_s {
@@ -110,18 +121,6 @@ struct _sequence_s {
   node* elems;
 };
 extern statement* create_sequence( node* );
-
-/**/
-typedef struct _statement statement;
-struct _statement {
-  enum {
-	INPUT, PRINT, ASSIGN, IF,
-	FOR, WHILE, CALL, SEQ,
-  } kind;
-  void* child;
-};
-
-extern void statement_as_lisp( statement*, FILE* );
 
 /**/
 struct _function {

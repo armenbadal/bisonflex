@@ -46,10 +46,10 @@ extern int yylineno;
 %%
 Program
     : NewLinesOpt FunctionList
-	{
-	  puts("Parsed");
-	}
-	;
+    {
+      puts("Parsed");
+    }
+    ;
 
 NewLinesOpt
     : NewLines
@@ -58,99 +58,99 @@ NewLinesOpt
 
 FunctionList
     : FunctionList Function
-	| /* empty */
-	;
+    | /* empty */
+    ;
 
 Function
     : xDeclare FunctionHeader
     | FunctionHeader StatementList xEnd xFunction NewLines
-	;
+    ;
 
 FunctionHeader
     : xFunction xIdent '(' ParameterList ')' NewLines
-	;
+    ;
 
 ParameterList
     : IdentifierList
-	| /* empty */
-	;
+    | /* empty */
+    ;
 
 NewLines
     : NewLines xEol
-	| xEol
-	;
+    | xEol
+    ;
 
 IdentifierList
     : IdentifierList ',' xIdent
-	| xIdent
-	;
+    | xIdent
+    ;
 
 StatementList
     : StatementList Statement NewLines
-	| /* empty */
-	;
+    | /* empty */
+    ;
 
 Statement
     : xInput xIdent
-	| xPrint Expression
-	| LetOpt xIdent xEq Expression
-	| xIf Expression xThen NewLines StatementList ElseIfPartList ElsePart xEnd xIf
-	| xFor xIdent xEq Expression xTo Expression StepOpt NewLines StatementList xEnd xFor
-	| xWhile Expression NewLines StatementList xEnd xWhile
-	| xCall xIdent ArgumentList
-	;
+    | xPrint Expression
+    | LetOpt xIdent xEq Expression
+    | xIf Expression xThen NewLines StatementList ElseIfPartList ElsePart xEnd xIf
+    | xFor xIdent xEq Expression xTo Expression StepOpt NewLines StatementList xEnd xFor
+    | xWhile Expression NewLines StatementList xEnd xWhile
+    | xCall xIdent ArgumentList
+    ;
 
 LetOpt
     : xLet
-	| /* empty */
-	;
+    | /* empty */
+    ;
 
 ElseIfPartList
     : ElseIfPartList xElseIf Expression xThen NewLines StatementList
-	| /* empty */
-	;
+    | /* empty */
+    ;
 
 ElsePart
     : xElse NewLines StatementList
-	| /* empty */
-	;
+    | /* empty */
+    ;
 
 StepOpt
     : xStep Expression
-	| /* empty */
-	;
+    | /* empty */
+    ;
 
 ArgumentList
     : ExpressionList
-	| /* empty */
-	;
+    | /* empty */
+    ;
 
 ExpressionList
     : ExpressionList ',' Expression
-	| Expression
-	;
+    | Expression
+    ;
 
 Expression
     : Expression xOr Expression
-	| Expression xAnd Expression
-	| Expression xEq Expression
-	| Expression xNe Expression
-	| Expression xGt Expression
-	| Expression xGe Expression
-	| Expression xLt Expression
-	| Expression xLe Expression
-	| Expression xAdd Expression
-	| Expression xSub Expression
-	| Expression xMul Expression
-	| Expression xDiv Expression
-	| Expression xPow Expression
-	| '(' Expression ')'
-	| xIdent '(' ArgumentList ')'
-	| xSub Expression %prec xNot
-	| xNot Expression
-	| xNumber
-	| xIdent
-	;
+    | Expression xAnd Expression
+    | Expression xEq Expression
+    | Expression xNe Expression
+    | Expression xGt Expression
+    | Expression xGe Expression
+    | Expression xLt Expression
+    | Expression xLe Expression
+    | Expression xAdd Expression
+    | Expression xSub Expression
+    | Expression xMul Expression
+    | Expression xDiv Expression
+    | Expression xPow Expression
+    | '(' Expression ')'
+    | xIdent '(' ArgumentList ')'
+    | xSub Expression %prec xNot
+    | xNot Expression
+    | xNumber
+    | xIdent
+    ;
 
 %%
 

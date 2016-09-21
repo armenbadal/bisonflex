@@ -56,21 +56,21 @@ void test_statement_as_lisp()
 
   // case 2
   statement* st2 = create_assign("xyz", create_binary(ADD, create_number(3.14),
-													  create_number(7)));
+                                                      create_number(7)));
   statement_as_lisp(st2, stdout);
   puts("");
 
   // case 3
   statement* st3 = create_if( create_binary(EQ, create_variable("n"),
-											create_variable("m")),
-							  create_assign("n", create_number(777)),
-							  create_assign("m", create_number(444)));
+                                            create_variable("m")),
+                              create_assign("n", create_number(777)),
+                              create_assign("m", create_number(444)));
   statement_as_lisp(st3, stdout);
   puts("");
 
   // case 4
   statement* st4 = create_for( "i", create_number(0), create_number(9),
-							   create_number(2), create_print(create_variable("i")));
+                               create_number(2), create_print(create_variable("i")));
   statement_as_lisp(st4, stdout);
   puts("");
 
@@ -98,7 +98,7 @@ void test_function_as_lisp()
   node* ps0 = create_node(create_variable("x"));
   ps0 = append_to(ps0, create_variable("y"));
   statement* be0 = create_assign("f", create_binary(ADD, create_variable("x"),
-													create_variable("y")));
+                                                    create_variable("y")));
   function* su0 = create_function("f", ps0, be0);
 
   function_as_lisp(su0, stdout);
