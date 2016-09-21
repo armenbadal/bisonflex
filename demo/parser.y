@@ -143,7 +143,7 @@ Expression
 	| Expression xPow Expression
 	| '(' Expression ')'
 	| xIdent '(' ArgumentList ')'
-	| '-' Expression %prec xNot
+	| xSub Expression %prec xNot
 	| xNot Expression
 	| xNumber
 	| xIdent

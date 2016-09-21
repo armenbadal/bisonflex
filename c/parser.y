@@ -45,8 +45,7 @@ extern int yylineno;
 Program
     : NewLinesOpt FunctionList
 	{
-	  puts("PARSED");
-	  return 0;
+	  puts("Parsed");
 	}
 	;
 
@@ -145,7 +144,7 @@ Expression
 	| Expression xPow Expression
 	| '(' Expression ')'
 	| xIdent '(' ArgumentList ')'
-	| '-' Expression %prec xNot
+	| xSub Expression %prec xNot
 	| xNot Expression
 	| xNumber
 	| xIdent
