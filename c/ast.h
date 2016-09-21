@@ -85,6 +85,8 @@ struct _for_s {
   expression* step;
   statement* body;
 };
+extern statement* create_for( const char*, expression*, expression*, expression*, statement* );
+
 
 /**/
 typedef struct _while_s while_s;
@@ -92,6 +94,7 @@ struct _while_s {
   expression* cond;
   statement* body;
 };
+extern statement* create_while( expression*, statement* );
 
 /**/
 typedef struct _call_s call_s;
@@ -99,12 +102,14 @@ struct _call_s {
   function* func;
   node* argus;
 };
+extern statement* create_call( function*, node* );
 
 /**/
 typedef struct _sequence_s sequence_s;
 struct _sequence_s {
   node* elems;
 };
+extern statement* create_sequence( node* );
 
 /**/
 typedef struct _statement statement;

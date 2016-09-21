@@ -1,3 +1,10 @@
+' case02.bas
+
+DECLARE FUNCTION Gcd(n, m)
+
+FUNCTION Main()
+  PRINT Gcd(152, 21)
+END FUNCTION
 
 ' մեծագույն ընդհանուր բաժանարար
 FUNCTION Gcd(n, m)

@@ -39,12 +39,11 @@ extern int yylineno;
 %right xNot
 
 %token xEol
-%token xEof 0
 
 %start Program
 %%
 Program
-    : NewLinesOpt FunctionList xEof
+    : NewLinesOpt FunctionList
 	{
 	  puts("PARSED");
 	  return 0;

@@ -1,3 +1,4 @@
+' case01.bas
 
 ' պարզ օրինակ
 FUNCTION Main()

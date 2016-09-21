@@ -37,14 +37,14 @@ static int yyerror( const char* );
 %right xNot
 
 %token xEol
-%token xEof 0
+
 
 %start Program
 %%
 Program
-    : NewLinesOpt FunctionList xEof
+    : NewLinesOpt FunctionList
 	{ 
-	  puts("PARSED"); 
+	  puts("Parsed"); 
 	}
 	;
 

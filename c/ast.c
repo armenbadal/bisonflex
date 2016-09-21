@@ -176,6 +176,45 @@ statement* create_if( expression* co, statement* tp, statement* ep )
 }
 
 /**/
+statement* create_for( const char* pr, expression* sa, expression* se, expression* sp, statement* bo )
+{
+  for_s* fop = GC_MALLOC(sizeof(for_s));
+  fop->param = GC_MALLOC(1 + strlen(pr));
+  strcpy(fop->param, pr);
+  fop->start = sa;
+  fop->stop = se;
+  fop->step = sp;
+  fop->body = bo;
+  return create_statement(FOR, fop);
+}
+
+/**/
+statement* create_while( expression* co, statement* bo )
+{
+  while_s* whi = GC_MALLOC(sizeof(while_s));
+  whi->cond = co;
+  whi->body = bo;
+  return create_statement(WHILE, whi);
+}
+
+/**/
+statement* create_call( function* fu, node* ag )
+{
+  call_s* cap = GC_MALLOC(sizeof(call_s));
+  cap->func = fu;
+  cap->argus = ag;
+  return create_statement(CALL, cap);
+}
+
+/**/
+statement* create_sequence( node* el )
+{
+  sequence_s* sep = GC_MALLOC(sizeof(sequence_s));
+  sep->elems = el;
+  return create_statement(SEQ, sep);
+}
+
+/**/
 void statement_as_lisp( statement* stat, FILE* out )
 {
   switch( stat->kind ) {

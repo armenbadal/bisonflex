@@ -58,6 +58,13 @@ void test_statement_as_lisp()
   statement* st2 = create_assign("xyz", create_binary(ADD, create_number(3.14), create_number(7)));
   statement_as_lisp(st2, stdout);
   puts("");
+
+  // case 3
+  statement* st3 = create_if( create_binary(EQ, create_variable("n"), create_variable("m")),
+							  create_assign("n", create_number(777)),
+							  create_assign("m", create_number(444)));
+  statement_as_lisp(st3, stdout);
+  puts("");							  
 }
 
 /**/
