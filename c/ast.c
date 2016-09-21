@@ -58,6 +58,9 @@ expression* create_apply( function* fu, node* ps )
 /**/
 void expression_as_lisp( expression* expr, FILE* out )
 {
+  if( expr == NULL )
+	return;
+  
   switch( expr->kind ) {
     case NUMBER:
 	  fprintf(out, "%lf", expr->number);
@@ -68,9 +71,9 @@ void expression_as_lisp( expression* expr, FILE* out )
     case UNARY:
 	  fprintf(out, "(");
 	  if( NEG == expr->oper )
-		fprintf(out,"- ");
+		fprintf(out, "basic-neg ");
 	  else if( NOT == expr->oper )
-		fprintf(out,"not ");
+		fprintf(out, "basic-not ");
 	  expression_as_lisp(expr->exo, out);
 	  fprintf(out, ")");
 	  break;
@@ -78,43 +81,43 @@ void expression_as_lisp( expression* expr, FILE* out )
 	  fprintf(out, "(");
 	  switch( expr->oper ) {
 	    case OR:
-		  fprintf(out, "or");
+		  fprintf(out, "basic-or");
 		  break;
 	    case AND:
-		  fprintf(out, "and");
+		  fprintf(out, "basic-and");
 		  break;
 	    case EQ:
-		  fprintf(out, "=");
+		  fprintf(out, "basic-eq");
 		  break;
 	    case NE:
-		  fprintf(out, "/=");
+		  fprintf(out, "basic-ne");
 		  break;
 	    case GT:
-		  fprintf(out, ">");
+		  fprintf(out, "basic-gt");
 		  break;
 	    case GE:
-		  fprintf(out, ">=");
+		  fprintf(out, "basic-ge");
 		  break;
 	    case LT:
-		  fprintf(out, "<");
+		  fprintf(out, "basic-lt");
 		  break;
 	    case LE:
-		  fprintf(out, "<=");
+		  fprintf(out, "basic-le");
 		  break;
 	    case ADD:
-		  fprintf(out, "+");
+		  fprintf(out, "basic-add");
 		  break;
 	    case SUB:
-		  fprintf(out, "-");
+		  fprintf(out, "basic-sub");
 		  break;
 	    case MUL:
-		  fprintf(out, "*");
+		  fprintf(out, "basic-mul");
 		  break;
 	    case DIV:
-		  fprintf(out, "/");
+		  fprintf(out, "basic-div");
 		  break;
 	    case POW:
-		  fprintf(out, "expt");
+		  fprintf(out, "basic-pow");
 		  break;
 	  }
 	  fprintf(out, " ");
@@ -123,9 +126,16 @@ void expression_as_lisp( expression* expr, FILE* out )
 	  expression_as_lisp(expr->exi, out);
 	  fprintf(out, ")");
 	  break;
-    case APPLY:
-	  // TODO իրականացնել ֆունկցիայի կիրառության թարգմանությունը
+    case APPLY: {
+	  fprintf(out, "(basic-apply %s ", expr->func->name);
+	  node* ip = expr->exs;
+	  while( ip != NULL ) {
+		expression_as_lisp((expression*)(ip->data), out);
+		ip = ip->next;
+	  }
+	  fprintf(out, ")");
 	  break;
+	}
   }
 }
 
@@ -217,29 +227,32 @@ statement* create_sequence( node* el )
 /**/
 void statement_as_lisp( statement* stat, FILE* out )
 {
+  if( stat == NULL )
+	return;
+  
   switch( stat->kind ) {
     case INPUT: {
 	  input_s* inp = (input_s*)stat->child;
-	  fprintf(out, "(read %s)", inp->vari);
+	  fprintf(out, "(basic-input %s) ", inp->vari);
 	  break;
 	}
     case PRINT: {
 	  print_s* prp = (print_s*)stat->child;
-	  fprintf(out, "(print ");
+	  fprintf(out, "(basic-print ");
 	  expression_as_lisp(prp->valu, out);
-	  fprintf(out, ")");
+	  fprintf(out, ") ");
 	  break;
 	}
     case ASSIGN: {
 	  assign_s* asp = (assign_s*)stat->child;
-	  fprintf(out, "(setf %s ", asp->vari);
+	  fprintf(out, "(basic-assign %s ", asp->vari);
 	  expression_as_lisp(asp->valu, out);
-	  fprintf(out, ")");
+	  fprintf(out, ") ");
 	  break;
 	}
     case IF: {
 	  if_s* brp = (if_s*)stat->child;
-	  fprintf(out, "(if ");
+	  fprintf(out, "(basic-if ");
 	  expression_as_lisp(brp->cond, out);
 	  fprintf(out, " ");
 	  statement_as_lisp(brp->thenp, out);
@@ -247,30 +260,48 @@ void statement_as_lisp( statement* stat, FILE* out )
 		fprintf(out, " ");
 		statement_as_lisp(brp->elsep, out);
 	  }
-	  fprintf(out, ")");
+	  fprintf(out, ") ");
 	  break;
 	}
     case FOR: {
 	  for_s* fop = (for_s*)stat->child;
-	  // param, start, stop, step, body
+	  fprintf(out, "(basic-for %s ", fop->param);
+	  expression_as_lisp(fop->start, out);
+	  fprintf(out, " ");
+	  expression_as_lisp(fop->stop, out);
+	  fprintf(out, " ");
+	  expression_as_lisp(fop->step, out);
+	  fprintf(out, " ");
+	  statement_as_lisp(fop->body, out);
+	  fprintf(out, ") ");
 	  break;
 	}
     case WHILE: {
 	  while_s* whp = (while_s*)stat->child;
-	  // cond, body
+	  fprintf(out, "(basic-while ");
+	  expression_as_lisp(whp->cond, out);
+	  fprintf(out, " ");
+	  statement_as_lisp(whp->body, out);
+	  fprintf(out, ") ");
 	  break;
 	}
     case CALL: {
 	  call_s* cap = (call_s*)stat->child;
-	  // func, argus
+	  fprintf(out, "(basic-call %s ", cap->func->name);
+	  node* ip = cap->argus;
+	  while( ip != NULL ) {
+		expression_as_lisp((expression*)(ip->data), out);
+		ip = ip->next;
+	  }
+	  fprintf(out, ") ");
 	  break;
 	}
     case SEQ: {
 	  sequence_s* sep = (sequence_s*)stat->child;
-	  fprintf(out, "(progn ");
-	  node* sp = (node*)sep->elems;
+	  fprintf(out, "(basic-seq ");
+	  node* sp = sep->elems;
 	  while( sp != NULL ) {
-		statement_as_lisp((statement*)sp->data, out);
+		statement_as_lisp((statement*)(sp->data), out);
 		sp = sp->next;
 	  }
 	  fprintf(out, ")");
@@ -280,14 +311,39 @@ void statement_as_lisp( statement* stat, FILE* out )
 }
 
 /**/
-void function_as_lisp( function* stat, FILE* out )
+function* create_function( const char* nm, node* pr, statement* bo )
 {
-  // TODO
+  function* subr = GC_MALLOC(sizeof(function));
+  subr->name = GC_MALLOC(1 + strlen(nm));
+  strcpy(subr->name, nm);
+  subr->parameters = pr;
+  subr->body = bo;
+  return subr;
 }
 
 /**/
-void program_as_lisp( program* stat, FILE* out )
+void function_as_lisp( function* subr, FILE* out )
 {
-  // TODO
+  fprintf(out, "(basic-function %s ( ", subr->name);
+  node* ip = subr->parameters;
+  while( ip != NULL ) {
+	expression_as_lisp((expression*)(ip->data), out);
+	fprintf(out, " ");
+	ip = ip->next;
+  }
+  fprintf(out, ") ");
+  statement_as_lisp(subr->body, out);
+  fprintf(out, ")");
+}
+
+/**/
+void program_as_lisp( program* pro, FILE* out )
+{
+  node* ip = pro->subrs;
+  while( ip != NULL ) {
+	function_as_lisp((function*)(ip->data), out);
+	fprintf(out, "\n");
+	ip = ip->next;
+  }
 }
 

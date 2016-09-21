@@ -129,13 +129,14 @@ struct _function {
   node* parameters;
   statement* body;
 };
+extern function* create_function( const char*, node*, statement* );
 
 extern void function_as_lisp( function*, FILE* );
 
 /**/
 typedef struct _program program;
 struct _program {
-  node* subs;
+  node* subrs;
 };
 
 extern void program_as_lisp( program*, FILE* );
