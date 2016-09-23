@@ -1111,7 +1111,7 @@ struct _statement {
 extern void statement_as_lisp( statement*, FILE* );
 ````
 
-Ներմուծման հրամանը ունի միայն փոփոխականի անունը պարունակող `vari` դաշտը։ `create_input` կոնստրուկտորը ստեղծում և վերադարձնում է ներմուծման հրամանի նմուշը։
+Բեյսիկի բոլոր ութ հրամանները մոդելավորող ստրուկտուրաները դուրս են բերված դրանց շարահյուսական տեսքերից՝ դեն նետելով ծառայողական բառերն ու մետասիմվոլները։ Այսպես, ներմուծման հրամանը բաղկացած է `INPUT` ծառայողական բառից և ներմուծվող փոփոխականի անունից։ Այն ներկայացնող ստրուկտուրան ունի միայն փոփոխականի անունը պարունակող `vari` դաշտը։ `create_input` կոնստրուկտորը ստեղծում և վերադարձնում է `_statement` ստրուկտուրայի նմուշը, որի `kind` դաշտում `INPUT` արժեքն է, իսկ `child` դաշտը կապված է `_input_s` ստրուկտուրայի նմուշի հետ։
 
 ````c
 /* ներմուծում */
@@ -1121,6 +1121,53 @@ struct _input_s {
 };
 extern statement* create_input( const char* );
 ````
+
+Արտածման հրամանը մոդելավորված է `_print_s` ստրուկտուրայով, որի միակ `valu` դաշտը կապված է արտածվելիք արտահայտության ծառի հետ։
+
+````c
+typedef struct _print_s print_s;
+struct _print_s {
+  expression* valu;
+};
+extern statement* create_print( expression* );
+````
+
+Վերագրման հրամանի `_assign_s` ստրուկտուրան երկու դաշտ ունի՝ `vari` և `valu`, դրանք համապատասխանաբար կապված են վերագրվող փոփոխականի անունին և վերագրվող արտահայտության ծառին։ _((?? երևի ճիշտ կլինի ներմուծման ու վերագրման գրամաններում փոփոխականը ոչ թե `char*` լինի, այլ փոփոխականի արտահայտություն՝ lvalue տարբերիչով))_
+
+````c
+typedef struct _assign_s assign_s;
+struct _assign_s {
+  char* vari;
+  expression* valu;
+};
+extern statement* create_assign( const char*, expression* );
+````
+
+Ճյուղավորման հրամանի `_if_s` կառուցվածքում երեք դաշտեր են՝ `cond` ― պայման, `thenp` ― պայմանի ճշմարիկ լինելու դեպքում կատարվող ճյուղը և `elsep` ― պայմանի կեղծ լինելու դեպքում կատարվող ճյուղը։ (Միայն այս դեպքում եմ շեղվել շարահյուսությունից և ճյուղավորման հրամանի մոդելը կառուցել եմ ավելի պարզ, քան նկարագրված  շարահյուսական կանոնում։ Կարծում եմ, որ ընթերցողն առանց մեկնաբանությունների էլ կհասկանա այդ պարզեցման հարմարությունը։)
+
+````c
+typedef struct _if_s if_s;
+struct _if_s {
+  expression* cond;
+  statement* thenp;
+  statement* elsep;
+};
+extern statement* create_if( expression*, statement*, statement* );
+````
+
+
+````c
+typedef struct _for_s for_s;
+struct _for_s {
+  char* param;
+  expression* start;
+  expression* stop;
+  expression* step;
+  statement* body;
+};
+extern statement* create_for( const char*, expression*, expression*, expression*, statement* );
+````
+
 
 Բեյսիկ լեզվի ֆունկցիան բաղկացած է ֆունկցիայի անունից, պարամետրերի ցուցակից և մարմնի հրամաններից։ `_function` ստրուկտուրան
 
