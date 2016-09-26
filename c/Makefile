@@ -1,9 +1,10 @@
 
-SOURCES=main.c scanner.yy.c parser.tab.c slist.c
+SOURCES=main.c scanner.yy.c parser.tab.c slist.c ast.c
+#OBJECTS=main.o scanner.yy.o parser.tab.o slist.o ast.c
+
 
 all: $(SOURCES)
 	gcc -gdwarf-2 -obasic-s $(SOURCES) -lgc
-
 
 scanner.yy.c: scanner.l
 	flex -oscanner.yy.c scanner.l

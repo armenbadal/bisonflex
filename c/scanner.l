@@ -1,5 +1,7 @@
 
 %{
+#include "ast.h"
+
 #include "parser.tab.h"
 %}
 

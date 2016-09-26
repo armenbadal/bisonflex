@@ -57,21 +57,21 @@ struct _statement {
 
 extern void statement_as_lisp( statement*, FILE* );
 
-/**/
+/* ներմուծում */
 typedef struct _input_s input_s;
 struct _input_s {
   char* vari;
 };
 extern statement* create_input( const char* );
 
-/**/
+/* արտածում */
 typedef struct _print_s print_s;
 struct _print_s {
   expression* valu;
 };
 extern statement* create_print( expression* );
 
-/**/
+/* վերագրում */
 typedef struct _assign_s assign_s;
 struct _assign_s {
   char* vari;
@@ -79,7 +79,7 @@ struct _assign_s {
 };
 extern statement* create_assign( const char*, expression* );
 
-/**/
+/* ճյողավորում */
 typedef struct _if_s if_s;
 struct _if_s {
   expression* cond;
@@ -88,7 +88,7 @@ struct _if_s {
 };
 extern statement* create_if( expression*, statement*, statement* );
 
-/**/
+/* պարամետրով ցիկլ */
 typedef struct _for_s for_s;
 struct _for_s {
   char* param;
@@ -99,7 +99,7 @@ struct _for_s {
 };
 extern statement* create_for( const char*, expression*, expression*, expression*, statement* );
 
-/**/
+/* նախապայմանով ցիկլ */
 typedef struct _while_s while_s;
 struct _while_s {
   expression* cond;
@@ -107,7 +107,7 @@ struct _while_s {
 };
 extern statement* create_while( expression*, statement* );
 
-/**/
+/* պրոցեդուրայի կանչ */
 typedef struct _call_s call_s;
 struct _call_s {
   function* func;
@@ -115,14 +115,14 @@ struct _call_s {
 };
 extern statement* create_call( function*, node* );
 
-/**/
+/* հրամանների հաջորդում */
 typedef struct _sequence_s sequence_s;
 struct _sequence_s {
   node* elems;
 };
 extern statement* create_sequence( node* );
 
-/**/
+/* ֆունկցիա */
 struct _function {
   char* name;
   node* parameters;
@@ -132,7 +132,7 @@ extern function* create_function( const char*, node*, statement* );
 
 extern void function_as_lisp( function*, FILE* );
 
-/**/
+/* ծրագիր */
 typedef struct _program program;
 struct _program {
   node* subrs;
