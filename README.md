@@ -1241,6 +1241,31 @@ Statement
 }
 ````
 
+Իսկ `%type` հրահանգով յուրաքանչյուր քերականական սիմվոլի համապատասխանեցնում եմ `%union` տիպի մի դաշտ։
 
+````
+%type <func> Function
+%type <func> FunctionHeader
+
+%type <stat> Statement
+%type <stat> ElsePart
+
+%type <expr> Expression
+%type <expr> StepOpt
+
+%type <list> ParameterList
+%type <list> IdentifierList
+%type <list> StatementList
+%type <list> ElseIfPartList
+%type <list> ArgumentList
+%type <list> ExpressionList
+````
+
+Տերմինալային սիմվոլների համար `%union`֊ի դաշտը կարելի է նշել հենց `%token` հրահանգով։ `xIdent` և `xNumber` սիմվոլների համար պետք է գրել․
+
+````
+%token <name> xIdent
+%token <number> xNumber
+````
 
 

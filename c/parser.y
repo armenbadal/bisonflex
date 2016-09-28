@@ -4,6 +4,8 @@
 %{
 #include <stdio.h>
 
+#include <gc.h>
+
 #include "ast.h"
 #include "slist.h"
   
@@ -11,6 +13,8 @@ extern int yylex();
 static int yyerror( const char* );
  
 extern int yylineno;
+
+extern program* prog;
 %}
 
 %error-verbose
@@ -54,19 +58,22 @@ extern int yylineno;
 
 %token xEol
 
-%type <list> FunctionList
 %type <func> Function
 %type <func> FunctionHeader
+
+%type <stat> Statement
+%type <stat> ElsePart
+
+%type <expr> Expression
+%type <expr> StepOpt
+
 %type <list> ParameterList
 %type <list> IdentifierList
-%type <stat> StatementList
-%type <stat> Statement
+%type <list> StatementList
 %type <list> ElseIfPartList
-%type <stat> ElsePart
-%type <expr> StepOpt
 %type <list> ArgumentList
 %type <list> ExpressionList
-%type <expr> Expression
+
 
 %start Program
 %%
@@ -79,36 +86,34 @@ Program
 
 NewLinesOpt
     : NewLines
-    | /* empty */
+    | %empty
     ;
 
 FunctionList
     : FunctionList Function
-	{
-	  // TODO
-	}
-    | /* empty */
-	{
-	  $$ = NULL;
-	}
+    | %empty
     ;
 
 Function
     : xDeclare FunctionHeader
 	{
 	  $$ = $2;
+      prog->subrs = append_to(prog->subrs, $$);
 	}
     | FunctionHeader StatementList xEnd xFunction NewLines
 	{
+	  function* fp = function_by_name(prog, $1->name);
+      if( fp == NULL )
+		prog->subrs = append_to(prog->subrs, $1);
+	  $1->body = create_sequence($2);
 	  $$ = $1;
-	  $$->body = $2;
 	}
     ;
 
 FunctionHeader
     : xFunction xIdent '(' ParameterList ')' NewLines
 	{
-	  $$ = create_function($2, $4, NULL);
+      $$ = create_function($2, $4, NULL);
 	}
     ;
 
@@ -117,7 +122,7 @@ ParameterList
 	{
 	  $$ = $1;
 	}
-    | /* empty */
+    | %empty
 	{
 	  $$ = NULL;
 	}
@@ -131,20 +136,20 @@ NewLines
 IdentifierList
     : IdentifierList ',' xIdent
 	{
-	  // TODO
+	  $$ = append_to($1, $3);
 	}
     | xIdent
 	{
-	  // TODO
+	  $$ = create_node($1);
 	}
     ;
 
 StatementList
     : StatementList Statement NewLines
 	{
-	  // TODO
+	  $$ = append_to($1, $2);
 	}
-    | /* empty */
+    | %empty
 	{
 	  $$ = NULL;
 	}
@@ -166,15 +171,15 @@ Statement
     | xIf Expression xThen NewLines StatementList ElseIfPartList ElsePart xEnd xIf
 	{
 	  statement* elp = NULL; // լրացնել
-	  $$ = create_if($2, $5, elp);
+	  $$ = create_if($2, create_sequence($5), elp);
 	}
     | xFor xIdent xEq Expression xTo Expression StepOpt NewLines StatementList xEnd xFor
 	{
-	  $$ = create_for($2, $4, $6, $7, $9);
+	  $$ = create_for($2, $4, $6, $7, create_sequence($9));
 	}
     | xWhile Expression NewLines StatementList xEnd xWhile
 	{
-	  $$ = create_while($2, $4);
+	  $$ = create_while($2, create_sequence($4));
 	}
     | xCall xIdent ArgumentList
 	{
@@ -185,28 +190,26 @@ Statement
 
 LetOpt
     : xLet
-	{
-	  // TODO
-	}
-    | /* empty */
-	{
-	  // TODO
-	}
+    | %empty
     ;
 
 ElseIfPartList
     : ElseIfPartList xElseIf Expression xThen NewLines StatementList
-	{}
-    | /* empty */
-	{}
+	{
+	  $$ = append_to($1, create_if($3, create_sequence($6), NULL));
+	}
+    | %empty
+	{
+	  $$ = NULL;
+	}
     ;
 
 ElsePart
     : xElse NewLines StatementList
 	{
-	  $$ = $3;
+	  $$ = create_sequence($3);
 	}
-    | /* empty */
+    | %empty
 	{
 	  $$ = NULL;
 	}
@@ -214,9 +217,13 @@ ElsePart
 
 StepOpt
     : xStep Expression
-	{}
-    | /* empty */
-	{}
+	{
+	  $$ = $2;
+	}
+    | %empty
+	{
+	  $$ = NULL;
+	}
     ;
 
 ArgumentList
@@ -224,7 +231,7 @@ ArgumentList
 	{
 	  $$ = $1;
 	}
-    | /* empty */
+    | %empty
 	{
 	  $$ = NULL;
 	}

@@ -337,6 +337,19 @@ void function_as_lisp( function* subr, FILE* out )
 }
 
 /**/
+function* function_by_name( program* pro, const char* nm )
+{
+  node* np = pro->subrs;
+  while( np != NULL ) {
+	function* fp = (function*)(np->data);
+	if( 0 == strcmp(fp->name, nm) )
+	  break;
+	np = np->next;
+  }
+  return np == NULL ? NULL : np->data;
+}
+
+/**/
 void program_as_lisp( program* pro, FILE* out )
 {
   node* ip = pro->subrs;

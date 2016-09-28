@@ -137,6 +137,7 @@ typedef struct _program program;
 struct _program {
   node* subrs;
 };
+extern function* function_by_name( program*, const char* );
 
 extern void program_as_lisp( program*, FILE* );
 
