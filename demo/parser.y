@@ -2,14 +2,26 @@
 %{
 #include <stdio.h>
 
+#include "ast.h"
+#include "slist.h"
+
 extern int yylex();
 static int yyerror( const char* );
 %}
 
 %error-verbose
 
-%token xIdent
-%token xNumber
+%union {
+  double number;    // իրական թիվ
+  char* name;       // իդենտիֆիկատոր
+  expression* expr; // արտահայտություն
+  statement* stat;  // հրաման
+  function* func;   // ֆունկցիա
+  node* list;       // ցուցակ
+}
+
+%token <name> xIdent
+%token <number> xNumber
 
 %token xDeclare
 %token xFunction
@@ -38,6 +50,22 @@ static int yyerror( const char* );
 
 %token xEol
 
+%type <func> Function
+%type <func> FunctionHeader
+
+%type <stat> Statement
+%type <stat> ElsePart
+
+%type <expr> Expression
+%type <expr> StepOpt
+
+%type <list> ParameterList
+%type <list> IdentifierList
+%type <list> StatementList
+%type <list> ElseIfPartList
+%type <list> ArgumentList
+%type <list> ExpressionList
+
 
 %start Program
 %%
@@ -50,26 +78,29 @@ Program
 
 NewLinesOpt
     : NewLines
-    | /* empty */
+    | %empty
     ;
 
 FunctionList
     : FunctionList Function
-	| /* empty */
+	| %empty
 	;
 
 Function
     : xDeclare FunctionHeader
+	{}
     | FunctionHeader StatementList xEnd xFunction NewLines
 	;
 
 FunctionHeader
     : xFunction xIdent '(' ParameterList ')' NewLines
+	{}
 	;
 
 ParameterList
     : IdentifierList
-	| /* empty */
+	| %empty
+	{}
 	;
 
 NewLines
@@ -80,51 +111,68 @@ NewLines
 IdentifierList
     : IdentifierList ',' xIdent
 	| xIdent
+	{}
 	;
 
 StatementList
     : StatementList Statement NewLines
-	| /* empty */
+	| %empty
+	{}
 	;
 
 Statement
     : xInput xIdent
+	{}
 	| xPrint Expression
+	{}
 	| LetOpt xIdent xEq Expression
+	{}
 	| xIf Expression xThen NewLines StatementList ElseIfPartList ElsePart xEnd xIf
+	{}
 	| xFor xIdent xEq Expression xTo Expression StepOpt NewLines StatementList xEnd xFor
+	{}
 	| xWhile Expression NewLines StatementList xEnd xWhile
+	{}
 	| xCall xIdent ArgumentList
+	{}
 	;
 
 LetOpt
     : xLet
-	| /* empty */
+	| %empty
 	;
 
 ElseIfPartList
     : ElseIfPartList xElseIf Expression xThen NewLines StatementList
-	| /* empty */
+	| %empty
+	{}
 	;
 
 ElsePart
     : xElse NewLines StatementList
-	| /* empty */
+	{}
+	| %empty
+	{}
 	;
 
 StepOpt
     : xStep Expression
-	| /* empty */
+	{}
+	| %empty
+	{}
 	;
 
 ArgumentList
     : ExpressionList
-	| /* empty */
+	| %empty
+	{}
 	;
 
 ExpressionList
     : ExpressionList ',' Expression
+	{}
 	| Expression
+	{}
 	;
 
 Expression
@@ -142,11 +190,17 @@ Expression
 	| Expression xDiv Expression
 	| Expression xPow Expression
 	| '(' Expression ')'
+	{}
 	| xIdent '(' ArgumentList ')'
+	{}
 	| xSub Expression %prec xNot
+	{}
 	| xNot Expression
+	{}
 	| xNumber
+	{}
 	| xIdent
+	{}
 	;
 
 %%
