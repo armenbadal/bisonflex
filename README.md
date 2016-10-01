@@ -1305,3 +1305,114 @@ ParameterList
 ...
 ````
 
+Նույնն անելով Bison֊ի ազդարարած մյուս սխալների համար, ստանում եմ «մաքուր» նկարագրություն, որտեղ տիպերի տեսակետից ամեն ինչ համաձայնեցված է, բայց դեռ օգտակար գործողություններ չկան։
+
+Անցնեմ առաջ։ Ես սովորություն ունեմ աբստրակտ քերականական ծառի կառուցումը սկսել «ամենամանր» տարրերից։ Տվյալ դեպքում սկսում եմ արտահայտություններից։ Նախ՝ պարզ տարրերը․ թվերի ու փոփոխականների համար ծառի տերևներ են կառուցվում համապատասխանաբար `create_number()` և `create_variable()` կոնստրուկտորներով․
+
+````
+Expression
+    : ....
+    | xNumber
+	{
+	  $$ = create_number($1);
+	}
+    | xIdent
+	{
+	  $$ = create_variable($1);
+	}
+    ;
+````
+
+Ֆունկցիայի կիրառման և ունար գործողությունների հանգույցները կառուցվում են համապատասխանաբար `create_apply()` և `create_unary()` կոնստրուկտորներով․
+
+````
+Expression
+    : ....
+	| xIdent '(' ArgumentList ')'
+    {
+	  $$ = create_apply($1, $3);
+	}
+    | xSub Expression %prec xNot
+	{
+	  $$ = create_unary(NEG, $2);
+	}
+	| xNot Expression
+	{
+	  $$ = create_unary(NOT, $2);
+	}
+....
+````
+
+Գործողությունների նախապատվության բարձրացման ու խմբավորման համար օգտագործվող `(` և `)` փակագծերի մշակումը պարզից էլ պարզ է․
+
+````
+Expression
+    : ....
+    | '(' Expression ')'
+	{
+	  $$ = $2;
+	}
+....
+````
+
+Բինար գործողություններին համապատասխանող բոլոր հանգույցները կառուցվում են նույն `create_binary()` կոնստրուկտորով, որի առաջին պարամետրը գործողության անունն է։
+
+````
+Expression
+    : Expression xOr Expression
+	{
+	  $$ = create_binary(OR, $1, $3);
+	}
+    | Expression xAnd Expression
+	{
+	  $$ = create_binary(AND, $1, $3);
+	}
+    | Expression xEq Expression
+	{
+	  $$ = create_binary(EQ, $1, $3);
+	}
+    | Expression xNe Expression
+	{
+	  $$ = create_binary(NE, $1, $3);
+	}
+    | Expression xGt Expression
+	{
+	  $$ = create_binary(GT, $1, $3);
+	}
+    | Expression xGe Expression
+	{
+	  $$ = create_binary(GE, $1, $3);
+	}
+	| Expression xLt Expression
+	{
+	  $$ = create_binary(LT, $1, $3);
+	}
+    | Expression xLe Expression
+	{
+	  $$ = create_binary(LE, $1, $3);
+	}
+    | Expression xAdd Expression
+	{
+	  $$ = create_binary(ADD, $1, $3);
+	}
+    | Expression xSub Expression
+	{
+	  $$ = create_binary(SUB, $1, $3);
+	}
+    | Expression xMul Expression
+	{
+	  $$ = create_binary(MUL, $1, $3);
+	}
+    | Expression xDiv Expression
+	{
+	  $$ = create_binary(DIV, $1, $3);
+	}
+    | Expression xPow Expression
+	{
+	  $$ = create_binary(POW, $1, $3);
+	}
+....
+````
+
+
+
