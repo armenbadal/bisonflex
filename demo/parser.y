@@ -190,17 +190,30 @@ Expression
 	| Expression xDiv Expression
 	| Expression xPow Expression
 	| '(' Expression ')'
-	{}
+	{
+	  $$ = $2;
+	}
 	| xIdent '(' ArgumentList ')'
-	{}
+	{
+	  function* func = NULL;
+	  $$ = create_apply(func, $3);
+	}
 	| xSub Expression %prec xNot
-	{}
+	{
+	  $$ = create_unary(NEG, $2);
+	}
 	| xNot Expression
-	{}
+	{
+	  $$ = create_unary(NOT, $2);
+	}
 	| xNumber
-	{}
+	{
+	  $$ = create_number($1);
+	}
 	| xIdent
-	{}
+	{
+	  $$ = create_variable($1);
+	}
 	;
 
 %%

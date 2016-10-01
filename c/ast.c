@@ -19,8 +19,7 @@ expression* create_variable( const char* nm )
 {
   expression* expr = GC_MALLOC(sizeof(expression));
   expr->kind = VARIABLE;
-  expr->name = GC_MALLOC(1 + strlen(nm));
-  strcpy(expr->name, nm);
+  expr->name = clone_str(nm);
   return expr;
 }
 
@@ -46,11 +45,11 @@ expression* create_binary( int op, expression* eo, expression* ei )
 }
 
 /**/
-expression* create_apply( function* fu, node* ps )
+expression* create_apply( const char* fu, node* ps )
 {
   expression* expr = GC_MALLOC(sizeof(expression));
   expr->kind = APPLY;
-  expr->func = fu;
+  expr->name = clone_str(fu);
   expr->exs = ps;
   return expr;
 }
@@ -127,7 +126,7 @@ void expression_as_lisp( expression* expr, FILE* out )
       fprintf(out, ")");
       break;
     case APPLY: {
-      fprintf(out, "(basic-apply %s ", expr->func->name);
+      fprintf(out, "(basic-apply %s ", expr->name);
       node* ip = expr->exs;
       while( ip != NULL ) {
         expression_as_lisp((expression*)(ip->data), out);
@@ -152,8 +151,7 @@ static statement* create_statement( int sk, void* chd )
 statement* create_input( const char* vr )
 {
   input_s* inp = GC_MALLOC(sizeof(input_s));
-  inp->vari = GC_MALLOC(1 + strlen(vr));
-  strcpy(inp->vari, vr);
+  inp->vari = clone_str(vr);
   return create_statement(INPUT, inp);
 }
 
@@ -169,8 +167,7 @@ statement* create_print( expression* ex )
 statement* create_assign( const char* vr, expression* vl )
 {
   assign_s* asi = GC_MALLOC(sizeof(assign_s));
-  asi->vari = GC_MALLOC(1 + strlen(vr));
-  strcpy(asi->vari, vr);
+  asi->vari = clone_str(vr);
   asi->valu = vl;
   return create_statement(ASSIGN, asi);
 }
@@ -189,8 +186,7 @@ statement* create_if( expression* co, statement* tp, statement* ep )
 statement* create_for( const char* pr, expression* sa, expression* se, expression* sp, statement* bo )
 {
   for_s* fop = GC_MALLOC(sizeof(for_s));
-  fop->param = GC_MALLOC(1 + strlen(pr));
-  strcpy(fop->param, pr);
+  fop->param = clone_str(pr);
   fop->start = sa;
   fop->stop = se;
   fop->step = sp;
@@ -314,8 +310,7 @@ void statement_as_lisp( statement* stat, FILE* out )
 function* create_function( const char* nm, node* pr, statement* bo )
 {
   function* subr = GC_MALLOC(sizeof(function));
-  subr->name = GC_MALLOC(1 + strlen(nm));
-  strcpy(subr->name, nm);
+  subr->name = clone_str(nm);
   subr->parameters = pr;
   subr->body = bo;
   return subr;
@@ -359,4 +354,13 @@ void program_as_lisp( program* pro, FILE* out )
     ip = ip->next;
   }
 }
+
+/**/
+char* clone_str( const char* so )
+{
+  char* res = GC_MALLOC(1 + strlen(so));
+  strcpy(res, so);
+  return res;
+}
+
 

@@ -30,7 +30,6 @@ struct _expression {
   } oper;
   expression* exo; // ենթաարտահայտություն
   expression* exi; // ենթաարտահայտություն
-  function* func; // կիրառվող ֆունկցիա
   node* exs; // ֆունկցիայի կիրառման պարամետրեր
 };
 
@@ -39,7 +38,7 @@ extern expression* create_number( double );
 extern expression* create_variable( const char* );
 extern expression* create_unary( int, expression* );
 extern expression* create_binary( int, expression*, expression* );
-extern expression* create_apply( function*, node* );
+extern expression* create_apply( const char*, node* );
 
 /* արտահայտության թարգմանությունը */
 extern void expression_as_lisp( expression*, FILE* );
@@ -140,6 +139,9 @@ struct _program {
 extern function* function_by_name( program*, const char* );
 
 extern void program_as_lisp( program*, FILE* );
+
+/* օժանդակ գործիքներ */
+extern char* clone_str( const char* );
 
 #endif
 

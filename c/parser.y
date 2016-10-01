@@ -307,8 +307,7 @@ Expression
 	}
 	| xIdent '(' ArgumentList ')'
     {
-	  function* calee = NULL; // որոնել ֆունկցիան ծրագրի մեջ
-	  $$ = create_apply(calee, $3);
+	  $$ = create_apply($1, $3);
 	}
     | xSub Expression %prec xNot
 	{
