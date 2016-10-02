@@ -1355,18 +1355,15 @@ Expression
 ....
 ````
 
-Բինար գործողություններին համապատասխանող բոլոր հանգույցները կառուցվում են նույն `create_binary()` կոնստրուկտորով, որի առաջին պարամետրը գործողության անունն է։
+Բինար գործողություններին համապատասխանող բոլոր հանգույցները կառուցվում են նույն `create_binary()` կոնստրուկտորով, որի առաջին պարամետրը գործողության անունն է։ Այդ անունները սահմանված են `_expression` ստրուկտուրայի մեջ՝ որպես անանուն թվարկման անդամներ։
 
 ````
 Expression
     : Expression xOr Expression
 	{
 	  $$ = create_binary(OR, $1, $3);
-	}
-    | Expression xAnd Expression
-	{
-	  $$ = create_binary(AND, $1, $3);
-	}
+    }
+    ...
     | Expression xEq Expression
 	{
 	  $$ = create_binary(EQ, $1, $3);
@@ -1375,44 +1372,112 @@ Expression
 	{
 	  $$ = create_binary(NE, $1, $3);
 	}
-    | Expression xGt Expression
-	{
-	  $$ = create_binary(GT, $1, $3);
-	}
-    | Expression xGe Expression
-	{
-	  $$ = create_binary(GE, $1, $3);
-	}
-	| Expression xLt Expression
-	{
-	  $$ = create_binary(LT, $1, $3);
-	}
-    | Expression xLe Expression
-	{
-	  $$ = create_binary(LE, $1, $3);
-	}
+    ...
     | Expression xAdd Expression
 	{
 	  $$ = create_binary(ADD, $1, $3);
 	}
-    | Expression xSub Expression
-	{
-	  $$ = create_binary(SUB, $1, $3);
-	}
+    ...
     | Expression xMul Expression
 	{
 	  $$ = create_binary(MUL, $1, $3);
 	}
-    | Expression xDiv Expression
-	{
-	  $$ = create_binary(DIV, $1, $3);
-	}
-    | Expression xPow Expression
-	{
-	  $$ = create_binary(POW, $1, $3);
-	}
 ....
 ````
 
+Աբստրակտ քերականական ծառում հրամաններին (ղեկավարող կառուցվածքներին) համապատասխանող հանգույցները կառուցվում են համապատասխան կոնստրուկտորներով։
 
+````
+Statement
+    : xInput xIdent
+	{
+	  $$ = create_input($2);
+	}
+    | xPrint Expression
+	{
+	  $$ = create_print($2);
+	}
+    | LetOpt xIdent xEq Expression
+	{
+	  $$ = create_assign($2, $4);
+	}
+    | xIf Expression xThen NewLines StatementList ElseIfPartList ElsePart xEnd xIf
+	{
+	  $$ = create_if($2, create_sequence($5), $6, $7);
+	}
+    | xFor xIdent xEq Expression xTo Expression StepOpt NewLines StatementList xEnd xFor
+	{
+	  $$ = create_for($2, $4, $6, $7, create_sequence($9));
+	}
+    | xWhile Expression NewLines StatementList xEnd xWhile
+	{
+	  $$ = create_while($2, create_sequence($4));
+	}
+    | xCall xIdent ArgumentList
+	{
+	  $$ = create_call($2, $3);
+	}
+    ;
+````
+
+Այստեղ միայն `IF` կառուցվածքի կոնստրուկտորն է, որ պարունակում է ավելի շատ դաշտեր, քան `_if_s` ստրուկտուրան։ `_if_s` ստրուկտուրան ես գրել եմ երեք դաշետերով՝ `cond`, `thenp` `elsep` Նույն `IF` կառուցվածքի `ElseIfPartList` տարրը սահմանված է որպես `IF`֊երի հաջորդականություն, որտեղ ամեն մի հաջորդ `IF`֊ը կապված է նախորդի `elsep` անդամին։ Սկզբում `ElseIfPartList`֊ը սահմանել էի ձախ֊ռեկուրսիվ եղանակով, ու գրել էի մի քիչ երկար կոդ, որը հերթական `ELSEIF`֊ի համար կառուցած `_if_s` նմուշը կապում է իրեն նախորդող `ELSEIF`֊երից վերջինի `elsep` անդամին։ 
+
+````
+ElseIfPartList
+    : ElseIfPartList xElseIf Expression xThen NewLines StatementList
+	{
+	  statement* anif = create_if($3, create_sequence($6), NULL, NULL);
+	  if( $1 == NULL )
+		$$ = anif;
+	  else {
+		if_s* heif = (if_s*)($1->child);
+		while( heif->elsep != NULL )
+		  heif = (if_s*)(heif->elsep->child);
+		heif->elsep = anif;
+		$$ = $1;
+	  }
+	}
+    | %empty
+	{
+	  $$ = NULL;
+	}
+    ;
+````
+
+Հետո որոշեցի ձախ֊ռեկուրսիան փոխարինել աջ֊ռեկուրսիայով ու ստացա ավելի պարզ կոդ․
+
+````
+ElseIfPartList
+    : xElseIf Expression xThen NewLines StatementList ElseIfPartList 
+	{
+	  $$ = create_if($2, create_sequence($5), $6, NULL);
+	}
+    | %empty
+	{
+	  $$ = NULL;
+	}
+    ;
+````
+
+Չնայած, որ Bison֊ը նույն հաջողությամբ ու արդյունավետությամբ մշակում է ձախ ու աջ ռեկուրսիաները, սակայն կա տարբերություն։ Իր աշխատանքում Bison֊ը օգտագործում է երկու կարևոր գործողություններ՝ Shift և Reduce։ Shift գործողության ժամանակ քերականական սիմվոլն ավելացվում է Bispon֊ի աշխատանքային ստեկում, իսկ Reduce գործողության շամանակ ստեկց հեռացվում են քերականական կանոնի աջ մասին համապատասխան տարրերը և դրանց փոխարեն ստեկում ավելացվում է նույն կանոնի աջ կողմի ոչ տերմինալային սիմվոլը։ Երբ կանոնը գրված է աջ֊ռեկուրսիվ տեսքով.
+
+````
+ExpressionList
+    : Expression ',' ExpressionList
+    | Expression
+	;
+````
+
+Bison֊ը նախ կատարում է բոլոր Shift գործողությունները և ստեկում ավելացնում է `Expression` և `,` սիմվոլները, ապա վերջում ստեկը `Reduce` գործողությամբ «կրճատում» է ըստ `ExpressionList` սիմվոլի սահմանման։ Ստացվում է, որ աջ֊ռեկուրսիվ կանոնները մշակելիս ավելի շատ ստեկ է «ծախսվում»։ Իսկ երբ կանոնն ունի ձախ֊ռեկուրսիվ սահմանում․
+
+````
+ExpressionList
+    : ExpressionList ',' Expression
+    | Expression
+	;
+````
+
+ապա Reduce գործողություննեն ավելի շուտ են կատարվում, և, տվյալ օրինակի դեպքում, «ծախսվում» է ստեկի ամենաշատը երեք տարր։ Վելի մանրամասն տես [John Levine, _flex & bison_, O'Reilly Media, 2009](http://shop.oreilly.com/product/9780596155988.do) գրքում։ 
+
+Բեյսիկի քերականության այն ձախ֊ռեկուրսիվ կանոնները, որոնք պիտի ցուցակ կառուցեն, ես ձևափոխեցի աջ֊ռեկուրսիվի։ Դա հեշտացնում է կապակցված ցուցակի կառուցումը։ Օրինակ․
 

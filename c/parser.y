@@ -62,6 +62,7 @@ extern program* prog;
 %type <func> FunctionHeader
 
 %type <stat> Statement
+%type <stat> ElseIfPartList
 %type <stat> ElsePart
 
 %type <expr> Expression
@@ -70,7 +71,6 @@ extern program* prog;
 %type <list> ParameterList
 %type <list> IdentifierList
 %type <list> StatementList
-%type <list> ElseIfPartList
 %type <list> ArgumentList
 %type <list> ExpressionList
 
@@ -81,6 +81,7 @@ Program
     : NewLinesOpt FunctionList
     {
       puts("Parsed");
+	  /*D*/ program_as_lisp(prog, stdout);
     }
     ;
 
@@ -134,20 +135,20 @@ NewLines
     ;
 
 IdentifierList
-    : IdentifierList ',' xIdent
+    : xIdent ',' IdentifierList
 	{
-	  $$ = append_to($1, $3);
+	  $$ = create_node($1, $3);
 	}
     | xIdent
 	{
-	  $$ = create_node($1);
+	  $$ = create_node($1, NULL);
 	}
     ;
 
 StatementList
-    : StatementList Statement NewLines
+    : Statement NewLines StatementList
 	{
-	  $$ = append_to($1, $2);
+	  $$ = create_node($1, $3);
 	}
     | %empty
 	{
@@ -170,8 +171,7 @@ Statement
 	}
     | xIf Expression xThen NewLines StatementList ElseIfPartList ElsePart xEnd xIf
 	{
-	  statement* elp = NULL; // լրացնել
-	  $$ = create_if($2, create_sequence($5), elp);
+	  $$ = create_if($2, create_sequence($5), $6, $7);
 	}
     | xFor xIdent xEq Expression xTo Expression StepOpt NewLines StatementList xEnd xFor
 	{
@@ -183,8 +183,7 @@ Statement
 	}
     | xCall xIdent ArgumentList
 	{
-	  function* calee = NULL; // որոնել ֆունկցիան ծրագրում
-	  $$ = create_call(calee, $3);
+	  $$ = create_call($2, $3);
 	}
     ;
 
@@ -194,9 +193,9 @@ LetOpt
     ;
 
 ElseIfPartList
-    : ElseIfPartList xElseIf Expression xThen NewLines StatementList
+    : xElseIf Expression xThen NewLines StatementList ElseIfPartList 
 	{
-	  $$ = append_to($1, create_if($3, create_sequence($6), NULL));
+	  $$ = create_if($2, create_sequence($5), $6, NULL);
 	}
     | %empty
 	{
@@ -238,13 +237,13 @@ ArgumentList
     ;
 
 ExpressionList
-    : ExpressionList ',' Expression
+    : Expression ',' ExpressionList
 	{
-	  $$ = append_to($1, $3);
+	  $$ = create_node($1, $3);
 	}
     | Expression
 	{
-	  $$ = create_node($1);
+	  $$ = create_node($1, NULL);
 	}
     ;
 

@@ -85,7 +85,7 @@ struct _if_s {
   statement* thenp;
   statement* elsep;
 };
-extern statement* create_if( expression*, statement*, statement* );
+extern statement* create_if( expression*, statement*, statement*, statement* );
 
 /* պարամետրով ցիկլ */
 typedef struct _for_s for_s;
@@ -109,10 +109,10 @@ extern statement* create_while( expression*, statement* );
 /* պրոցեդուրայի կանչ */
 typedef struct _call_s call_s;
 struct _call_s {
-  function* func;
+  char* func;
   node* argus;
 };
-extern statement* create_call( function*, node* );
+extern statement* create_call( const char*, node* );
 
 /* հրամանների հաջորդում */
 typedef struct _sequence_s sequence_s;

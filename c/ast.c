@@ -173,12 +173,22 @@ statement* create_assign( const char* vr, expression* vl )
 }
 
 /**/
-statement* create_if( expression* co, statement* tp, statement* ep )
+statement* create_if( expression* co, statement* tp, statement* eis, statement* ep )
 {
+  statement* sp = eis;
+  if( sp != NULL ) {
+	if_s* p = (if_s*)(sp->child);
+	while( p->elsep != NULL )
+	  p = (if_s*)(p->elsep->child);
+	p->elsep = ep;
+  }
+  else
+	sp = ep;
+  
   if_s* ifp = GC_MALLOC(sizeof(if_s));
   ifp->cond = co;
   ifp->thenp = tp;
-  ifp->elsep = ep;
+  ifp->elsep = sp;
   return create_statement(IF, ifp);
 }
 
@@ -204,10 +214,10 @@ statement* create_while( expression* co, statement* bo )
 }
 
 /**/
-statement* create_call( function* fu, node* ag )
+statement* create_call( const char* fu, node* ag )
 {
   call_s* cap = GC_MALLOC(sizeof(call_s));
-  cap->func = fu;
+  cap->func = clone_str(fu);
   cap->argus = ag;
   return create_statement(CALL, cap);
 }
@@ -283,7 +293,7 @@ void statement_as_lisp( statement* stat, FILE* out )
     }
     case CALL: {
       call_s* cap = (call_s*)stat->child;
-      fprintf(out, "(basic-call %s ", cap->func->name);
+      fprintf(out, "(basic-call %s ", cap->func);
       node* ip = cap->argus;
       while( ip != NULL ) {
         expression_as_lisp((expression*)(ip->data), out);
@@ -294,13 +304,17 @@ void statement_as_lisp( statement* stat, FILE* out )
     }
     case SEQ: {
       sequence_s* sep = (sequence_s*)stat->child;
-      fprintf(out, "(basic-seq ");
-      node* sp = sep->elems;
-      while( sp != NULL ) {
-        statement_as_lisp((statement*)(sp->data), out);
-        sp = sp->next;
-      }
-      fprintf(out, ")");
+	  if( sep->elems->next == NULL )
+		statement_as_lisp((statement*)(sep->elems->data), out);
+	  else {
+		fprintf(out, "(basic-seq ");
+		node* sp = sep->elems;
+		while( sp != NULL ) {
+		  statement_as_lisp((statement*)(sp->data), out);
+		  sp = sp->next;
+		}
+		fprintf(out, ")");
+	  }
       break;
     }
   }

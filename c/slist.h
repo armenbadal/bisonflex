@@ -8,7 +8,7 @@ struct _node {
   node* next;
 };
 
-extern node* create_node( void* vl );
+extern node* create_node( void* vl, node* );
 extern node* append_to( node* nd, void* vl );
 
 #endif

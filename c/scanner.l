@@ -15,7 +15,10 @@ comment     \'.*$
 %%
 [ \t]       { /**/ }
 {comment}   { /**/ }
-{number}    { return xNumber; }
+{number}    {
+              yylval.number = atof(yytext);
+              return xNumber;
+            }
 "DECLARE"   { return xDeclare; }
 "FUNCTION"  { return xFunction; }
 "LET"       { return xLet; }
@@ -34,7 +37,10 @@ comment     \'.*$
 "OR"        { return xOr; }
 "AND"       { return xAnd; }
 "NOT"       { return xNot; }
-{ident}     { return xIdent; }
+{ident}     {
+              yylval.name = clone_str(yytext);
+              return xIdent;
+            }
 "="         { return xEq; }
 "<>"        { return xNe; }
 ">"         { return xGt; }
