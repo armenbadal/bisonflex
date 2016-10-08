@@ -1530,9 +1530,9 @@ Function
 Bison նկարագրության ընդլայնման մասին այսքանը։ Հիմա իսկը ժամանակն է իրար վրա հավաքելու ամբողջ արված գործն ու տեսնել թե ինչպես է իմ _տրանսլյատորը_ Բեյսիկ լեզվով գրված ծրագիրը թարգմանում Լիսպ ներկայացման։
 
 
-## Տրանսլյատոր․ առաջին փորձ
+## Գործարկման երկրորդ փորձ
 
-Առաջինը պիտի ստեղծեմ տրանսլյատորի _մուտքի կետ_ `main()` ֆունկցիան։ Այդ ֆունկցիայում պետք է ստեղծվի վերը հիշատակված `prog` օբյեկտը և կանչվի Bison֊ի գեներացրած `yyparse()` ֆունկցիան։
+Տրանսլյատորի _մուտքի կետ_ `main()` ֆունկցիան պետք է խմբագրել ու դրանում ավելացնել մի նոր հրաման, որը ստեղծում է վերը հիշատակված `prog` օբյեկտը։
 
 ````c
 /* main.c */
@@ -1569,19 +1569,11 @@ scanner.yy.c: scanner.l
 parser.tab.c parser.tab.h: parser.y
 	bison -d parser.y
 
-test_ast: ast.h ast.c test_ast.c slist.h slist.c
-	gcc -gdwarf-2 -otest_ast ast.c slist.c test_ast.c -lgc
-
-test_slist: slist.h slist.c test_slist.c
-	gcc -gdwarf-2 -otest_slist slist.c test_slist.c -lgc
-
 clean:
 	rm -f *.tab.*
 	rm -f *.yy.c
 	rm -f *.o
 	rm -f basic-s
-	rm -f test_ast
-	rm -f test_slist
 ````
 
 Հիմա պետք է պարզապես bash հրամանային ինտերպրետատորում ներմուծել `make` հրամանն ու ստանալ `basic-o` կատարվող մոդուլը։
