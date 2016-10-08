@@ -1,10 +1,7 @@
 
-#include <stdio.h>
-
 #include <gc.h>
 
 #include "ast.h"
-#include "slist.h"
 
 program* prog = NULL;
 
