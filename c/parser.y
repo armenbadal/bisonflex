@@ -103,10 +103,15 @@ Function
     | FunctionHeader StatementList xEnd xFunction NewLines
     {
       function* fp = function_by_name(prog, $1->name);
-      if( fp == NULL )
-        prog->subrs = append_to(prog->subrs, $1);
-      $1->body = create_sequence($2);
-      $$ = $1;
+      if( fp != NULL ) {
+	fp->body = create_sequence($2);
+	$$ = fp;
+      }
+      else {
+	$1->body = create_sequence($2);
+	$$ = $1;
+	prog->subrs = append_to(prog->subrs, $$);
+      }
     }
     ;
 
@@ -128,11 +133,6 @@ ParameterList
     }
     ;
 
-NewLines
-    : NewLines xEol
-    | xEol
-    ;
-
 IdentifierList
     : xIdent ',' IdentifierList
     {
@@ -142,6 +142,11 @@ IdentifierList
     {
       $$ = create_node($1, NULL);
     }
+    ;
+
+NewLines
+    : NewLines xEol
+    | xEol
     ;
 
 StatementList

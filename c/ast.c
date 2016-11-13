@@ -177,13 +177,13 @@ statement* create_if( expression* co, statement* tp, statement* eis, statement* 
 {
   statement* sp = eis;
   if( sp != NULL ) {
-	if_s* p = (if_s*)(sp->child);
-	while( p->elsep != NULL )
-	  p = (if_s*)(p->elsep->child);
-	p->elsep = ep;
+    if_s* p = (if_s*)(sp->child);
+    while( p->elsep != NULL )
+      p = (if_s*)(p->elsep->child);
+    p->elsep = ep;
   }
   else
-	sp = ep;
+    sp = ep;
   
   if_s* ifp = GC_MALLOC(sizeof(if_s));
   ifp->cond = co;
@@ -304,17 +304,17 @@ void statement_as_lisp( statement* stat, FILE* out )
     }
     case SEQ: {
       sequence_s* sep = (sequence_s*)stat->child;
-	  if( sep->elems->next == NULL )
-		statement_as_lisp((statement*)(sep->elems->data), out);
-	  else {
-		fprintf(out, "(basic-seq ");
-		node* sp = sep->elems;
-		while( sp != NULL ) {
-		  statement_as_lisp((statement*)(sp->data), out);
-		  sp = sp->next;
-		}
-		fprintf(out, ")");
-	  }
+      if( sep->elems->next == NULL )
+	statement_as_lisp((statement*)(sep->elems->data), out);
+      else {
+	fprintf(out, "(basic-seq ");
+	node* sp = sep->elems;
+	while( sp != NULL ) {
+	  statement_as_lisp((statement*)(sp->data), out);
+	  sp = sp->next;
+	}
+	fprintf(out, ")");
+      }
       break;
     }
   }
@@ -336,8 +336,7 @@ void function_as_lisp( function* subr, FILE* out )
   fprintf(out, "(basic-function %s ( ", subr->name);
   node* ip = subr->parameters;
   while( ip != NULL ) {
-    expression_as_lisp((expression*)(ip->data), out);
-    fprintf(out, " ");
+    fprintf(out, "%s ", (char*)(ip->data));
     ip = ip->next;
   }
   fprintf(out, ") ");
