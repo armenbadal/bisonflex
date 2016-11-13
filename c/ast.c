@@ -50,7 +50,7 @@ expression* create_apply( const char* fu, node* ps )
   expression* expr = GC_MALLOC(sizeof(expression));
   expr->kind = APPLY;
   expr->name = clone_str(fu);
-  expr->exs = ps;
+  expr->args = ps;
   return expr;
 }
 
@@ -127,7 +127,7 @@ void expression_as_lisp( expression* expr, FILE* out )
       break;
     case APPLY: {
       fprintf(out, "(basic-apply %s ", expr->name);
-      node* ip = expr->exs;
+      node* ip = expr->args;
       while( ip != NULL ) {
         expression_as_lisp((expression*)(ip->data), out);
         ip = ip->next;

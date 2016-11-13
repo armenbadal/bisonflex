@@ -62,7 +62,6 @@ extern program* prog;
 %type <func> FunctionHeader
 
 %type <stat> Statement
-%type <stat> ElseIfPartList
 %type <stat> ElsePart
 
 %type <expr> Expression
@@ -71,6 +70,7 @@ extern program* prog;
 %type <list> ParameterList
 %type <list> IdentifierList
 %type <list> StatementList
+%type <stat> ElseIfPartList
 %type <list> ArgumentList
 %type <list> ExpressionList
 
@@ -81,7 +81,6 @@ Program
     : NewLinesOpt FunctionList
     {
       puts("Parsed");
-	  /*D*/ program_as_lisp(prog, stdout);
     }
     ;
 

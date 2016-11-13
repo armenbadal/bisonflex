@@ -1,4 +1,6 @@
 
+#include <stdio.h>
+
 #include <gc.h>
 
 #include "ast.h"
@@ -12,6 +14,9 @@ int main()
 
   extern int yyparse();
   int ok = yyparse();
+  if( 0 == ok )
+	  	program_as_lisp(prog, stdout);
+
   return ok;
 }
 
