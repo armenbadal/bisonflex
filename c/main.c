@@ -15,7 +15,7 @@ int main()
   extern int yyparse();
   int ok = yyparse();
   if( 0 == ok )
-	  	program_as_lisp(prog, stdout);
+	  	program_as_json(prog, stdout);
 
   return ok;
 }

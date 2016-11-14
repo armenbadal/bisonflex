@@ -41,7 +41,7 @@ extern expression* create_binary( int, expression*, expression* );
 extern expression* create_apply( const char*, node* );
 
 /* արտահայտության թարգմանությունը */
-extern void expression_as_lisp( expression*, FILE* );
+extern void expression_as_json( expression*, FILE* );
 
 /* հրամաններ */
 typedef struct _statement statement;
@@ -54,7 +54,7 @@ struct _statement {
   void* child; // հրամանի ցուցիչ
 };
 
-extern void statement_as_lisp( statement*, FILE* );
+extern void statement_as_json( statement*, FILE* );
 
 /* ներմուծում */
 typedef struct _input_s input_s;
@@ -129,7 +129,7 @@ struct _function {
 };
 extern function* create_function( const char*, node*, statement* );
 
-extern void function_as_lisp( function*, FILE* );
+extern void function_as_json( function*, FILE* );
 
 /* ծրագիր */
 typedef struct _program program;
@@ -138,7 +138,7 @@ struct _program {
 };
 extern function* function_by_name( program*, const char* );
 
-extern void program_as_lisp( program*, FILE* );
+extern void program_as_json( program*, FILE* );
 
 /* օժանդակ գործիքներ */
 extern char* clone_str( const char* );

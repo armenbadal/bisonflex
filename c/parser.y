@@ -79,9 +79,6 @@ extern program* prog;
 %%
 Program
     : NewLinesOpt FunctionList
-    {
-      puts("Parsed");
-    }
     ;
 
 NewLinesOpt
