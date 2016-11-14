@@ -380,16 +380,16 @@ void function_as_json( function* subr, FILE* out )
   json_open_section(out, "function");
   json_string_string(out, "name", subr->name);
   fprintf(out, ",\n");
-  json_open_section(out, "parameters");
+  print_indent(out);
+  fprintf(out, "\"parameters\" : [");
   node* ip = subr->parameters;
   while( ip != NULL ) {
-    json_string_string(out, "variable", (char*)(ip->data));
+    fprintf(out, "\"%s\"", (char*)(ip->data));
     ip = ip->next;
 	if( ip != NULL )
-	  fprintf(out, ",\n");
+	  fprintf(out, ", ");
   }
-  json_close_section(out);
-  fprintf(out, ",\n");
+  fprintf(out, "],\n");
   statement_as_json(subr->body, out);
   json_close_section(out);
 }
