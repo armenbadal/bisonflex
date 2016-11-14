@@ -87,6 +87,13 @@ static void json_string_string( FILE* out, const char* name, const char* val )
 }
 
 /**/
+static const char* opnames[] = {
+  "or", "and", "eq", "ne", "gt", "ge",
+  "lt", "le", "add", "sub", "mul",
+  "div", "pow", "not", "neg"
+};
+
+/**/
 void expression_as_json( expression* expr, FILE* out )
 {
   if( expr == NULL )
@@ -100,55 +107,12 @@ void expression_as_json( expression* expr, FILE* out )
       json_string_string(out, "variable", expr->name);
       break;
     case UNARY:
-      if( NEG == expr->oper )
-		json_open_section(out, "neg");
-      else if( NOT == expr->oper )
-        json_open_section(out, "not");
+	  json_open_section(out, opnames[expr->oper]);
       expression_as_json(expr->exo, out);
 	  json_close_section(out);
       break;
     case BINARY:
-      switch( expr->oper ) {
-        case OR:
-          json_open_section(out, "or");
-          break;
-        case AND:
-          json_open_section(out, "and");
-          break;
-        case EQ:
-          json_open_section(out, "eq");
-          break;
-        case NE:
-          json_open_section(out, "ne");
-          break;
-        case GT:
-          json_open_section(out, "gt");
-          break;
-        case GE:
-          json_open_section(out, "ge");
-          break;
-        case LT:
-          json_open_section(out, "lt");
-          break;
-        case LE:
-          json_open_section(out, "le");
-          break;
-        case ADD:
-          json_open_section(out, "add");
-          break;
-        case SUB:
-          json_open_section(out, "sub");
-          break;
-        case MUL:
-          json_open_section(out, "mul");
-          break;
-        case DIV:
-          json_open_section(out, "div");
-          break;
-        case POW:
-          json_open_section(out, "pow");
-          break;
-      }
+	  json_open_section(out, opnames[expr->oper]);
       expression_as_json(expr->exo, out);
       fprintf(out, ",\n");
       expression_as_json(expr->exi, out);
@@ -156,13 +120,17 @@ void expression_as_json( expression* expr, FILE* out )
       break;
     case APPLY: {
       json_open_section(out, "apply");
-	  json_string_string(out, "proc", expr->name);
+	  json_string_string(out, "function", expr->name);
       fprintf(out, ",\n");
-      node* ip = expr->args; // REVIEW
+	  json_open_section(out, "arguments");
+      node* ip = expr->args;
       while( ip != NULL ) {
         expression_as_json((expression*)(ip->data), out);
         ip = ip->next;
+		if( ip != NULL )
+		  fprintf(out, ",\n");
       }
+	  json_close_section(out);
       json_close_section(out);
     }
   }
