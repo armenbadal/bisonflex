@@ -1602,7 +1602,7 @@ int main()
 SOURCES=main.c scanner.yy.c parser.tab.c slist.c ast.c
 
 all: $(SOURCES)
-	gcc -gdwarf-2 -obasic-s $(SOURCES) -lgc
+	gcc --std=gnu11 -gdwarf-2 -obasic-s $(SOURCES) -lgc
 
 scanner.yy.c: scanner.l
 	flex -oscanner.yy.c scanner.l
@@ -1617,6 +1617,21 @@ clean:
 	rm -f basic-s
 ````
 
-Հիմա պետք է պարզապես bash հրամանային ինտերպրետատորում ներմուծել `make` հրամանն ու ստանալ `basic-o` կատարվող մոդուլը։
+Հիմա պետք է պարզապես bash հրամանային ինտերպրետատորում ներմուծել `make` հրամանն ու ստանալ `basic-o` կատարվող մոդուլը։ 
+
+Այս `basic-o` մոդուլը Բեյսիկ ծրագիր տեքստը կարդում է ներմուծման ստանդարտ հոսքից, իսկ կառուցված JSON կոդը դուրս է բերում արտածման ստանդարտ հոսքին։ Ահա գործարկման մի օրինակ․
+
+````bash
+$ ./basic-s < ../tests/case01.bas
+{
+  "function" : {
+    "name" : "Main",
+    "parameters" : {},
+    "print" : {
+      "number" : 3.140000
+    }
+  }
+}
+````
 
 
