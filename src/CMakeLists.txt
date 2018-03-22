@@ -1,0 +1,22 @@
+CMAKE_MINIMUM_REQUIRED(VERSION 3.5)
+PROJECT(basic-s)
+
+FIND_PACKAGE(FLEX)
+FIND_PACKAGE(BISON)
+
+FIND_LIBRARY(GC gc)
+
+FLEX_TARGET(scanner scanner.l ${CMAKE_CURRENT_BINARY_DIR}/scanner.yy.c)
+BISON_TARGET(parser parser.y ${CMAKE_CURRENT_BINARY_DIR}/parser.tab.c DEFINES_FILE ${CMAKE_CURRENT_BINARY_DIR}/parser.tab.h)
+ADD_FLEX_BISON_DEPENDENCY(scanner parser)
+
+INCLUDE_DIRECTORIES(${CMAKE_SOURCE_DIR})
+
+ADD_EXECUTABLE(basic-s
+    main.c
+    ${FLEX_scanner_OUTPUTS}
+    ${BISON_parser_OUTPUTS}
+    slist.c
+    ast.c)
+
+TARGET_LINK_LIBRARIES(basic-s gc)
